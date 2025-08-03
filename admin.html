@@ -357,20 +357,23 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-const ASSETS_PATH = "Assets/contacts/";
+// Use Assets/products/ for all product images
+const ASSETS_PATH = "Assets/products/";
+
+// List all images available for products in Assets/products/
 const AVAILABLE_IMAGES = [
   "mooncream.jpg",
-  "x.svg",
-  "leaderboard.jpg",
-  "instagram.svg",
   "trend1.jpg",
   "trend2.jpg",
   "trend3.jpg",
-  "discord.svg",
-  "facebook.svg"
+  "leaderboard.jpg",
+  "product1.png",
+  "product2.png",
+  "product3.jpg"
+  // Add all product images here (exact filenames in Assets/products/)
 ];
 
-// Populate product image dropdown
+// Populate product image dropdown from Assets/products/
 function renderAssetsOptions() {
   const select = document.getElementById('addProdImg');
   select.innerHTML = '<option value="" disabled selected>Image</option>';
