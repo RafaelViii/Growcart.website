@@ -679,9 +679,10 @@ body {
   position: relative;
 }
 .product-img-box img {
-  width: 100%;
-  height: 100%;
+  width: 120%;
+  height: 120%;
   object-fit: contain;
+  translate: 0 -18px;
   image-rendering: pixelated;
   display: block;
   background: var(--placeholder-color);
