@@ -1,11 +1,3 @@
-<!--
-This adds a PROMO VOUCHER section to your admin panel, with ability to:
-- Add/edit/delete voucher codes (stored in Firestore 'promos' collection)
-- Set voucher as active/inactive
-- Set percent discount
-
-Shopfront should query 'promos' from Firestore to validate vouchers!
--->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -27,8 +19,13 @@ Shopfront should query 'promos' from Firestore to validate vouchers!
       box-shadow: 0 6px 32px #bcbbe6a0;
       padding: 24px;
     }
-    h2 { margin-top: 0; color: #4435a7; }
-    .section { margin-bottom: 32px; }
+    h2 {
+      margin-top: 0;
+      color: #4435a7;
+    }
+    .section {
+      margin-bottom: 32px;
+    }
     table {
       border-collapse: collapse;
       width: 100%;
@@ -41,7 +38,9 @@ Shopfront should query 'promos' from Firestore to validate vouchers!
       text-align: left;
       background: #fff;
     }
-    th { background: #e6e4ff; }
+    th {
+      background: #e6e4ff;
+    }
     tbody tr {
       background: #fff;
       border-radius: 8px;
@@ -49,7 +48,9 @@ Shopfront should query 'promos' from Firestore to validate vouchers!
       margin-bottom: 12px;
       transition: box-shadow 0.13s;
     }
-    tbody tr:not(:last-child) { border-bottom: 3px solid #edeaff; }
+    tbody tr:not(:last-child) {
+      border-bottom: 3px solid #edeaff;
+    }
     tbody tr:hover {
       background: #f7f4ff;
       box-shadow: 0 2px 12px #bcbbe660;
@@ -73,12 +74,22 @@ Shopfront should query 'promos' from Firestore to validate vouchers!
       font-weight: 600;
       transition: background .15s;
     }
-    .btn.save { background: #00b894; }
-    .btn.save:hover { background: #009170; }
-    .btn:hover { background: #4435a7; }
+    .btn.save {
+      background: #00b894;
+    }
+    .btn.save:hover {
+      background: #009170;
+    }
+    .btn:hover {
+      background: #4435a7;
+    }
     .img-preview {
-      width: 48px; height: 48px; object-fit: cover; border-radius: 4px;
-      background: #e6e4ff; display: inline-block;
+      width: 48px;
+      height: 48px;
+      object-fit: cover;
+      border-radius: 4px;
+      background: #e6e4ff;
+      display: inline-block;
     }
     .category-label {
       padding: 2px 6px;
@@ -88,52 +99,144 @@ Shopfront should query 'promos' from Firestore to validate vouchers!
       font-size: .92em;
       white-space: nowrap;
     }
-    .trending-toggle { font-size: 1.1em; cursor: pointer; color: #e17055; }
+    .trending-toggle {
+      font-size: 1.1em;
+      cursor: pointer;
+      color: #e17055;
+    }
     .product-actions {
-      display: flex; flex-direction: row; gap: 8px; align-items: center; justify-content: flex-start;
+      display: flex;
+      flex-direction: row;
+      gap: 8px;
+      align-items: center;
+      justify-content: flex-start;
     }
     .product-separator {
-      border: none; border-bottom: 2px solid #eceafd; margin: 18px 0 10px 0; width: 100%;
+      border: none;
+      border-bottom: 2px solid #eceafd;
+      margin: 18px 0 10px 0;
+      width: 100%;
     }
-    /* PROMOS section */
-    .promo-row input[type="text"], .promo-row input[type="number"] {
-      width: 80px; margin-right: 4px;
+    .cat-saved {
+      display: none;
+      color: #00b894;
+      margin-left: 6px;
+      font-size: 1.3em;
     }
-    .promo-row .btn { margin-right: 0; }
-    .promo-row select { margin-right: 4px; }
-
+    .order-filter-btns {
+      margin-bottom: 15px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .order-filter-btn {
+      padding: 6px 14px;
+      background: #e6e4ff;
+      color: #4435a7;
+      border: 0;
+      border-radius: 3px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .13s;
+    }
+    .order-filter-btn.active, .order-filter-btn:active {
+      background: #6c5ce7;
+      color: #fff;
+    }
     @media (max-width: 860px) {
-      .admin-container { margin: 10px; padding: 10px; max-width: 100vw; }
+      .admin-container {
+        margin: 10px;
+        padding: 10px;
+        max-width: 100vw;
+      }
     }
     @media (max-width: 700px) {
-      .admin-container { padding: 3vw; margin: 0; border-radius: 0; box-shadow: none; }
-      table, th, td { font-size: .96em; }
-      .img-preview { width: 32px; height: 32px; }
-      form input, form select, form button {
-        display: block; width: 100%; margin: 5px 0; box-sizing: border-box;
+      .admin-container {
+        padding: 3vw;
+        margin: 0;
+        border-radius: 0;
+        box-shadow: none;
       }
-      form label { display: inline-block; margin-bottom: 3px; }
-      .btn { width: 100%; margin: 0 0 8px 0; min-width: unset; }
-      .product-actions { flex-direction: column; align-items: stretch; gap: 8px; width: 100%; }
-      table { display: block; overflow-x: auto; white-space: nowrap; }
-      tbody tr { margin-bottom: 18px; }
+      table, th, td {
+        font-size: .96em;
+      }
+      .img-preview {
+        width: 32px;
+        height: 32px;
+      }
+      form input, form select, form button {
+        display: block;
+        width: 100%;
+        margin: 5px 0;
+        box-sizing: border-box;
+      }
+      form label {
+        display: inline-block;
+        margin-bottom: 3px;
+      }
+      .btn {
+        width: 100%;
+        margin: 0 0 8px 0;
+        min-width: unset;
+      }
+      .product-actions {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+        width: 100%;
+      }
+      table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+      }
+      tbody tr {
+        margin-bottom: 18px;
+      }
+      .order-filter-btns {
+        gap: 4px;
+      }
     }
     @media (max-width: 500px) {
-      .admin-container { padding: 2vw; }
-      th, td { padding: 6px 3px; }
-      table, thead, tbody, th, td, tr { display: block; }
-      thead tr { display: none; }
-      tbody tr { margin-bottom: 16px; border-bottom: 2px solid #e6e4ff; }
+      .admin-container {
+        padding: 2vw;
+      }
+      th, td {
+        padding: 6px 3px;
+      }
+      table, thead, tbody, th, td, tr {
+        display: block;
+      }
+      thead tr {
+        display: none;
+      }
+      tbody tr {
+        margin-bottom: 16px;
+        border-bottom: 2px solid #e6e4ff;
+      }
       td {
-        text-align: right; position: relative; padding-left: 50%; min-height: 36px;
-        border: none; border-bottom: 1px solid #e6e4ff;
+        text-align: right;
+        position: relative;
+        padding-left: 50%;
+        min-height: 36px;
+        border: none;
+        border-bottom: 1px solid #e6e4ff;
       }
       td:before {
-        content: attr(data-label); position: absolute; left: 5px; top: 7px;
-        font-weight: bold; color: #4435a7; text-align: left; font-size: 0.97em;
+        content: attr(data-label);
+        position: absolute;
+        left: 5px;
+        top: 7px;
+        font-weight: bold;
+        color: #4435a7;
+        text-align: left;
+        font-size: 0.97em;
       }
     }
-    input, select, button { min-height: 38px; font-size: 1em; }
+    input, select, button {
+      min-height: 38px;
+      font-size: 1em;
+    }
   </style>
 </head>
 <body>
@@ -155,6 +258,31 @@ Shopfront should query 'promos' from Firestore to validate vouchers!
     <form id="addCatForm" style="margin-top:8px;">
       <input type="text" id="newCatName" placeholder="New category name" required>
       <button class="btn" type="submit">Add Category</button>
+    </form>
+  </div>
+
+  <!-- Promo Codes Section -->
+  <div class="section">
+    <h3>Promo Codes</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Code</th>
+          <th>Discount (%)</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="promoTableBody"></tbody>
+    </table>
+    <form id="addPromoForm" style="margin-top:8px;">
+      <input type="text" id="newPromoCode" placeholder="Promo code" required style="text-transform:uppercase;">
+      <input type="number" id="newPromoDiscount" placeholder="Discount %" min="1" max="100" required>
+      <select id="newPromoStatus">
+        <option value="active" selected>Active</option>
+        <option value="inactive">Inactive</option>
+      </select>
+      <button class="btn" type="submit">Add Promo</button>
     </form>
   </div>
   
@@ -191,34 +319,10 @@ Shopfront should query 'promos' from Firestore to validate vouchers!
     </form>
   </div>
 
-  <!-- PROMOS/Vouchers Section -->
-  <div class="section">
-    <h3 style="margin-top:32px;">Promo / Voucher Codes</h3>
-    <table>
-      <thead>
-        <tr>
-          <th>Code</th>
-          <th>Discount (%)</th>
-          <th>Status</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody id="promoTableBody"></tbody>
-    </table>
-    <form id="addPromoForm" autocomplete="off">
-      <input type="text" id="addPromoCode" placeholder="Code (e.g. SUMMER15)" required maxlength="16" style="width:110px;">
-      <input type="number" id="addPromoDiscount" placeholder="Discount" min="1" max="99" required style="width:60px;">
-      <select id="addPromoStatus" required>
-        <option value="active" selected>Active</option>
-        <option value="inactive">Inactive</option>
-      </select>
-      <button class="btn" type="submit">Add Promo</button>
-    </form>
-  </div>
-
   <!-- Orders Section -->
   <div class="section">
     <h3 style="margin-top:32px;">Orders</h3>
+    <div class="order-filter-btns" id="orderFilterBtns"></div>
     <table>
       <thead>
         <tr>
@@ -255,65 +359,27 @@ const db = getFirestore(app);
 
 const ASSETS_PATH = "Assets/contacts/";
 const AVAILABLE_IMAGES = [
-  "mooncream.jpg","x.svg","leaderboard.jpg","instagram.svg","trend1.jpg","trend2.jpg","trend3.jpg","discord.svg","facebook.svg"
+  "mooncream.jpg",
+  "x.svg",
+  "leaderboard.jpg",
+  "instagram.svg",
+  "trend1.jpg",
+  "trend2.jpg",
+  "trend3.jpg",
+  "discord.svg",
+  "facebook.svg"
 ];
 
-// PROMOS section
-let promos = [];
-function renderPromos() {
-  const body = document.getElementById('promoTableBody');
-  body.innerHTML = '';
-  promos.forEach(promo => {
-    body.innerHTML += `
-      <tr class="promo-row">
-        <td><input type="text" value="${promo.code}" id="pcode_${promo.id}" maxlength="16"></td>
-        <td><input type="number" value="${promo.discount}" id="pdiscount_${promo.id}" min="1" max="99"></td>
-        <td>
-          <select id="pstatus_${promo.id}">
-            <option value="active"${promo.status === "active" ? " selected" : ""}>Active</option>
-            <option value="inactive"${promo.status === "inactive" ? " selected" : ""}>Inactive</option>
-          </select>
-        </td>
-        <td>
-          <button class="btn save" onclick="window.savePromo('${promo.id}')">Save</button>
-          <button class="btn" onclick="window.deletePromo('${promo.id}')">Delete</button>
-        </td>
-      </tr>
-    `;
+// Populate product image dropdown
+function renderAssetsOptions() {
+  const select = document.getElementById('addProdImg');
+  select.innerHTML = '<option value="" disabled selected>Image</option>';
+  AVAILABLE_IMAGES.forEach(img => {
+    select.innerHTML += `<option value="${img}">${img}</option>`;
   });
 }
-onSnapshot(collection(db, "promos"), (snapshot) => {
-  promos = [];
-  snapshot.forEach(docSnap => {
-    promos.push({ id: docSnap.id, ...docSnap.data() });
-  });
-  renderPromos();
-});
-document.getElementById('addPromoForm').onsubmit = async function(e) {
-  e.preventDefault();
-  const code = document.getElementById('addPromoCode').value.trim().toUpperCase();
-  const discount = parseInt(document.getElementById('addPromoDiscount').value);
-  const status = document.getElementById('addPromoStatus').value;
-  if (!code || isNaN(discount) || discount < 1 || discount > 99) return alert("Invalid promo code or discount.");
-  if (promos.some(p => p.code === code)) { alert("Promo code already exists."); return; }
-  await addDoc(collection(db, "promos"), { code, discount, status });
-  document.getElementById('addPromoCode').value = '';
-  document.getElementById('addPromoDiscount').value = '';
-  document.getElementById('addPromoStatus').value = 'active';
-};
-window.savePromo = async function(id) {
-  const code = document.getElementById(`pcode_${id}`).value.trim().toUpperCase();
-  const discount = parseInt(document.getElementById(`pdiscount_${id}`).value);
-  const status = document.getElementById(`pstatus_${id}`).value;
-  if (!code || isNaN(discount) || discount < 1 || discount > 99) return alert("Invalid values.");
-  await updateDoc(doc(db, "promos", id), { code, discount, status });
-};
-window.deletePromo = async function(id) {
-  if (!confirm("Delete this promo code?")) return;
-  await deleteDoc(doc(db, "promos", id));
-};
 
-// CATEGORIES, PRODUCTS, ORDERS -- same as your current admin panel
+// --- Categories ---
 let categories = [];
 function renderCategories() {
   const body = document.getElementById('catTableBody');
@@ -323,20 +389,40 @@ function renderCategories() {
     tr.innerHTML = `
       <td data-label="Name">
         <input type="text" value="${cat.name}" data-id="${cat.id}" style="width:83%;" class="cat-edit-inp">
+        <span class="cat-saved" style="display:none;color:#00b894;margin-left:6px;font-size:1.3em;">✔️</span>
       </td>
       <td data-label="Actions">
-        <button class="btn" onclick="window.updateCategory('${cat.id}')">Save</button>
-        <button class="btn" onclick="window.deleteCategory('${cat.id}')" ${products.some(p=>p.category===cat.id)?'disabled':''}>Delete</button>
+        <button class="btn" onclick="window.updateCategory('${cat.id}', this)">Save</button>
+        <button class="btn" onclick="window.deleteCategory('${cat.id}')">Delete</button>
       </td>
     `;
     body.appendChild(tr);
+
+    // Add event listeners for auto-save
+    const inp = tr.querySelector('input.cat-edit-inp');
+    const savedMark = tr.querySelector('.cat-saved');
+
+    inp.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        window.updateCategory(cat.id, null, savedMark);
+        inp.blur();
+      }
+    });
+    inp.addEventListener('blur', function() {
+      window.updateCategory(cat.id, null, savedMark);
+    });
   });
+
+  // Populate add product category dropdown
   const select = document.getElementById('addProdCat');
   select.innerHTML = '<option value="" disabled selected>Category</option>';
   categories.forEach(cat => {
     select.innerHTML += `<option value="${cat.id}">${cat.name}</option>`;
   });
 }
+
+// Listen to Firestore categories
 onSnapshot(collection(db, "categories"), (snapshot) => {
   categories = [];
   snapshot.forEach(docSnap => {
@@ -345,14 +431,23 @@ onSnapshot(collection(db, "categories"), (snapshot) => {
   renderCategories();
   renderProducts();
 });
-window.updateCategory = async function(catId) {
+
+window.updateCategory = async function(catId, btn, savedMark) {
   const inp = document.querySelector(`input.cat-edit-inp[data-id="${catId}"]`);
   if (inp && inp.value.trim()) {
     await updateDoc(doc(db, "categories", catId), { name: inp.value.trim() });
+    if (savedMark) {
+      savedMark.style.display = "inline";
+      setTimeout(() => { savedMark.style.display = "none"; }, 900);
+    }
   }
 };
 window.deleteCategory = async function(catId) {
-  if (!confirm("Delete this category?")) return;
+  if (!confirm("Delete this category? All products under this category will become uncategorized.")) return;
+  const affected = products.filter(p => p.category === catId);
+  for (const prod of affected) {
+    await updateDoc(doc(db, "products", prod.id), { category: "" });
+  }
   await deleteDoc(doc(db, "categories", catId));
 };
 document.getElementById('addCatForm').onsubmit = async function(e) {
@@ -363,13 +458,73 @@ document.getElementById('addCatForm').onsubmit = async function(e) {
   document.getElementById('newCatName').value = '';
 };
 
-// PRODUCTS
+// --- PROMO CODES ---
+let promos = [];
+function renderPromos() {
+  const body = document.getElementById('promoTableBody');
+  body.innerHTML = '';
+  promos.forEach(promo => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td data-label="Code">
+        <input type="text" value="${promo.code}" data-id="${promo.id}" style="width:80px;text-transform:uppercase;" class="promo-edit-code">
+      </td>
+      <td data-label="Discount (%)">
+        <input type="number" min="1" max="100" value="${promo.discount}" data-id="${promo.id}" class="promo-edit-discount" style="width:60px;">
+      </td>
+      <td data-label="Status">
+        <select data-id="${promo.id}" class="promo-edit-status">
+          <option value="active" ${promo.status==="active"?"selected":""}>Active</option>
+          <option value="inactive" ${promo.status==="inactive"?"selected":""}>Inactive</option>
+        </select>
+      </td>
+      <td data-label="Actions">
+        <button class="btn" onclick="window.updatePromo('${promo.id}')">Save</button>
+        <button class="btn" onclick="window.deletePromo('${promo.id}')">Delete</button>
+      </td>
+    `;
+    body.appendChild(tr);
+  });
+}
+
+onSnapshot(collection(db, "promos"), (snapshot) => {
+  promos = [];
+  snapshot.forEach(docSnap => {
+    promos.push({ id: docSnap.id, ...docSnap.data() });
+  });
+  renderPromos();
+});
+
+window.updatePromo = async function(promoId) {
+  const code = document.querySelector(`.promo-edit-code[data-id="${promoId}"]`).value.trim().toUpperCase();
+  const discount = parseInt(document.querySelector(`.promo-edit-discount[data-id="${promoId}"]`).value, 10) || 0;
+  const status = document.querySelector(`.promo-edit-status[data-id="${promoId}"]`).value;
+  await updateDoc(doc(db, "promos", promoId), { code, discount, status });
+};
+
+window.deletePromo = async function(promoId) {
+  if (!confirm("Delete this promo code?")) return;
+  await deleteDoc(doc(db, "promos", promoId));
+};
+
+document.getElementById('addPromoForm').onsubmit = async function(e) {
+  e.preventDefault();
+  const code = document.getElementById('newPromoCode').value.trim().toUpperCase();
+  const discount = parseInt(document.getElementById('newPromoDiscount').value, 10) || 0;
+  const status = document.getElementById('newPromoStatus').value;
+  if (!code || !discount) return;
+  await addDoc(collection(db, "promos"), { code, discount, status });
+  document.getElementById('newPromoCode').value = '';
+  document.getElementById('newPromoDiscount').value = '';
+  document.getElementById('newPromoStatus').value = 'active';
+};
+
+// --- Products ---
 let products = [];
 function renderProducts() {
   const body = document.getElementById('prodTableBody');
   body.innerHTML = '';
   products.forEach((prod, idx) => {
-    const cat = categories.find(c=>c.id===prod.category);
     const tr = document.createElement('tr');
     tr.innerHTML = `
       <td data-label="Preview"><img class="img-preview" src="${ASSETS_PATH + prod.image}" alt="" onerror="this.src='${ASSETS_PATH}placeholder.jpg'"></td>
@@ -405,6 +560,7 @@ function renderProducts() {
     }
   });
 }
+
 onSnapshot(collection(db, "products"), (snapshot) => {
   products = [];
   snapshot.forEach(docSnap => {
@@ -413,6 +569,7 @@ onSnapshot(collection(db, "products"), (snapshot) => {
   renderProducts();
   renderCategories();
 });
+
 window.saveProduct = async function(id) {
   const prod = products.find(p=>p.id===id);
   if (!prod) return;
@@ -424,16 +581,19 @@ window.saveProduct = async function(id) {
     name, price, category, stock
   });
 };
+
 window.deleteProduct = async function(id) {
   if (!confirm("Delete this product?")) return;
   await deleteDoc(doc(db, "products", id));
 };
+
 window.toggleTrending = async function(id) {
   const prod = products.find(p=>p.id===id);
   if (prod) {
     await updateDoc(doc(db, "products", id), { trending: !prod.trending });
   }
 };
+
 document.getElementById('addProdForm').onsubmit = async function(e) {
   e.preventDefault();
   const category = document.getElementById('addProdCat').value;
@@ -457,15 +617,57 @@ document.getElementById('addProdForm').onsubmit = async function(e) {
   document.getElementById('addProdCat').selectedIndex = 0;
   document.getElementById('addProdTrend').checked = false;
 };
+
+// Initial assets dropdown
 renderAssetsOptions();
 
-// ORDERS
+// --- Orders ---
 let orders = [];
 const STATUS_LIST = ["pending", "done", "cancelled", "refund"];
+
+const ORDER_FILTERS = [
+  { label: "All", value: "all" },
+  { label: "Pending", value: "pending" },
+  { label: "Done", value: "done" },
+  { label: "Cancelled", value: "cancelled" },
+  { label: "Refunded", value: "refund" }
+];
+let orderFilter = "all";
+
+function renderOrderFilterBtns() {
+  const btnsDiv = document.getElementById("orderFilterBtns");
+  btnsDiv.innerHTML = "";
+  ORDER_FILTERS.forEach(f => {
+    const btn = document.createElement("button");
+    btn.className = "order-filter-btn" + (orderFilter === f.value ? " active" : "");
+    btn.textContent = f.label;
+    btn.onclick = () => {
+      orderFilter = f.value;
+      renderOrders();
+      renderOrderFilterBtns();
+    };
+    btnsDiv.appendChild(btn);
+  });
+}
+renderOrderFilterBtns();
+
 function renderOrders() {
   const body = document.getElementById('ordersTableBody');
   body.innerHTML = '';
-  orders.forEach(order => {
+  let displayOrders = [...orders];
+  if (orderFilter !== "all") {
+    displayOrders = displayOrders.filter(o => (o.status || "pending") === orderFilter);
+  }
+  const statusSortOrder = { pending: 0, done: 1, cancelled: 2, refund: 3 };
+  displayOrders.sort((a, b) => {
+    const sa = statusSortOrder[a.status || "pending"] ?? 99;
+    const sb = statusSortOrder[b.status || "pending"] ?? 99;
+    if (sa !== sb) return sa - sb;
+    const ta = a.created?.seconds || 0;
+    const tb = b.created?.seconds || 0;
+    return tb - ta;
+  });
+  displayOrders.forEach(order => {
     const itemsHtml = order.items && Array.isArray(order.items)
       ? order.items.map(i => `<div>${i.title} x${i.qty}</div>`).join('')
       : '';
@@ -488,6 +690,7 @@ function renderOrders() {
       </tr>
     `;
   });
+
   document.querySelectorAll('.order-status-sel').forEach(sel => {
     sel.onchange = async function() {
       const id = sel.getAttribute('data-id');
@@ -496,6 +699,7 @@ function renderOrders() {
     };
   });
 }
+
 onSnapshot(query(collection(db, "orders"), orderBy("created", "desc")), (snapshot) => {
   orders = [];
   snapshot.forEach(docSnap => {
@@ -503,6 +707,7 @@ onSnapshot(query(collection(db, "orders"), orderBy("created", "desc")), (snapsho
   });
   renderOrders();
 });
+
 window.deleteOrder = async function(id) {
   if (!confirm("Delete this order?")) return;
   await deleteDoc(doc(db, "orders", id));
