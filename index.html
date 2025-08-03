@@ -45,25 +45,28 @@
   </style>
 
   <script type="module">
-// ...your Firebase and other code...
-
-// Roblox Profile Preview using your proxy!
-const robloxInput = document.getElementById('robloxUsername');
-const robloxProfilePreview = document.getElementById('robloxProfilePreview');
-
 robloxInput.addEventListener('input', async function() {
   const username = robloxInput.value.trim();
   robloxProfilePreview.innerHTML = '';
   if (!username) return;
   robloxProfilePreview.innerHTML = '<span style="color:#bbb">Loading...</span>';
   try {
-    // Use your local proxy!
-  const res = await fetch('https://688f241798a3e500087df8a0--tranquil-sprinkles-488bbb.netlify.app/netlify/functions/roblox-lookup', {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({ username })
-});
-const data = await res.json();
+    // OLD CODE (remove or comment this out)
+    // const res = await fetch(`https://users.roblox.com/v1/usernames/users`, {
+    //   method: "POST",
+    //   headers: { "Content-Type": "application/json" },
+    //   body: JSON.stringify({ usernames: [username], excludeBannedUsers: true })
+    // });
+    // const data = await res.json();
+
+    // NEW CODE (add this instead)
+    const res = await fetch('https://688f241798a3e500087df8a0--tranquil-sprinkles-488bbb.netlify.app/.netlify/functions/roblox-lookup', {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username })
+    });
+    const data = await res.json();
+
     if (!data.data || !data.data[0]) throw 0;
     const user = data.data[0];
     const avatarRes = await fetch(`https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=${user.id}&size=100x100&format=Png`);
@@ -79,7 +82,6 @@ const data = await res.json();
     robloxProfilePreview.innerHTML = `<span class="error">User not found or banned.</span>`;
   }
 });
-// ...rest of your JS code...
 </script>
 </head>
 <body>
