@@ -107,6 +107,7 @@
 :root {
   --retro-pink: #d28bb6;
   --retro-blue: #7bb5dc;
+  --price-color: #e15679d0;
   --retro-purple: #5f3a8d;
   --retro-bg: #2e2043;
   --retro-card: #f1e7f7;
@@ -691,7 +692,7 @@ body {
 }
 .product-main-title {
   font-size: 1.1rem;
-  color: #7e48c3;
+  color: #4926c79f;
   margin: 0.1rem 0 0.2rem 0;
   text-align: center;
   letter-spacing: 1.5px;
@@ -700,7 +701,7 @@ body {
 }
 .product-price {
   font-size: 1.05rem;
-  color: var(--retro-pink);
+  color: var(--price-color);
   margin-bottom: 0.3rem;
   text-shadow: 2px 2px 0 #fff, 1px 1px 0 var(--retro-bg);
   text-align: center;
