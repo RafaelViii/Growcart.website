@@ -1,3 +1,11 @@
+<!--
+This adds a PROMO VOUCHER section to your admin panel, with ability to:
+- Add/edit/delete voucher codes (stored in Firestore 'promos' collection)
+- Set voucher as active/inactive
+- Set percent discount
+
+Shopfront should query 'promos' from Firestore to validate vouchers!
+-->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -19,13 +27,8 @@
       box-shadow: 0 6px 32px #bcbbe6a0;
       padding: 24px;
     }
-    h2 {
-      margin-top: 0;
-      color: #4435a7;
-    }
-    .section {
-      margin-bottom: 32px;
-    }
+    h2 { margin-top: 0; color: #4435a7; }
+    .section { margin-bottom: 32px; }
     table {
       border-collapse: collapse;
       width: 100%;
@@ -38,9 +41,7 @@
       text-align: left;
       background: #fff;
     }
-    th {
-      background: #e6e4ff;
-    }
+    th { background: #e6e4ff; }
     tbody tr {
       background: #fff;
       border-radius: 8px;
@@ -48,9 +49,7 @@
       margin-bottom: 12px;
       transition: box-shadow 0.13s;
     }
-    tbody tr:not(:last-child) {
-      border-bottom: 3px solid #edeaff;
-    }
+    tbody tr:not(:last-child) { border-bottom: 3px solid #edeaff; }
     tbody tr:hover {
       background: #f7f4ff;
       box-shadow: 0 2px 12px #bcbbe660;
@@ -74,22 +73,12 @@
       font-weight: 600;
       transition: background .15s;
     }
-    .btn.save {
-      background: #00b894;
-    }
-    .btn.save:hover {
-      background: #009170;
-    }
-    .btn:hover {
-      background: #4435a7;
-    }
+    .btn.save { background: #00b894; }
+    .btn.save:hover { background: #009170; }
+    .btn:hover { background: #4435a7; }
     .img-preview {
-      width: 48px;
-      height: 48px;
-      object-fit: cover;
-      border-radius: 4px;
-      background: #e6e4ff;
-      display: inline-block;
+      width: 48px; height: 48px; object-fit: cover; border-radius: 4px;
+      background: #e6e4ff; display: inline-block;
     }
     .category-label {
       padding: 2px 6px;
@@ -99,118 +88,52 @@
       font-size: .92em;
       white-space: nowrap;
     }
-    .trending-toggle {
-      font-size: 1.1em;
-      cursor: pointer;
-      color: #e17055;
-    }
+    .trending-toggle { font-size: 1.1em; cursor: pointer; color: #e17055; }
     .product-actions {
-      display: flex;
-      flex-direction: row;
-      gap: 8px;
-      align-items: center;
-      justify-content: flex-start;
+      display: flex; flex-direction: row; gap: 8px; align-items: center; justify-content: flex-start;
     }
     .product-separator {
-      border: none;
-      border-bottom: 2px solid #eceafd;
-      margin: 18px 0 10px 0;
-      width: 100%;
+      border: none; border-bottom: 2px solid #eceafd; margin: 18px 0 10px 0; width: 100%;
     }
+    /* PROMOS section */
+    .promo-row input[type="text"], .promo-row input[type="number"] {
+      width: 80px; margin-right: 4px;
+    }
+    .promo-row .btn { margin-right: 0; }
+    .promo-row select { margin-right: 4px; }
 
     @media (max-width: 860px) {
-      .admin-container {
-        margin: 10px;
-        padding: 10px;
-        max-width: 100vw;
-      }
+      .admin-container { margin: 10px; padding: 10px; max-width: 100vw; }
     }
-
     @media (max-width: 700px) {
-      .admin-container {
-        padding: 3vw;
-        margin: 0;
-        border-radius: 0;
-        box-shadow: none;
-      }
-      table, th, td {
-        font-size: .96em;
-      }
-      .img-preview {
-        width: 32px;
-        height: 32px;
-      }
+      .admin-container { padding: 3vw; margin: 0; border-radius: 0; box-shadow: none; }
+      table, th, td { font-size: .96em; }
+      .img-preview { width: 32px; height: 32px; }
       form input, form select, form button {
-        display: block;
-        width: 100%;
-        margin: 5px 0;
-        box-sizing: border-box;
+        display: block; width: 100%; margin: 5px 0; box-sizing: border-box;
       }
-      form label {
-        display: inline-block;
-        margin-bottom: 3px;
-      }
-      .btn {
-        width: 100%;
-        margin: 0 0 8px 0;
-        min-width: unset;
-      }
-      .product-actions {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 8px;
-        width: 100%;
-      }
-      table {
-        display: block;
-        overflow-x: auto;
-        white-space: nowrap;
-      }
-      tbody tr {
-        margin-bottom: 18px;
-      }
+      form label { display: inline-block; margin-bottom: 3px; }
+      .btn { width: 100%; margin: 0 0 8px 0; min-width: unset; }
+      .product-actions { flex-direction: column; align-items: stretch; gap: 8px; width: 100%; }
+      table { display: block; overflow-x: auto; white-space: nowrap; }
+      tbody tr { margin-bottom: 18px; }
     }
-
     @media (max-width: 500px) {
-      .admin-container {
-        padding: 2vw;
-      }
-      th, td {
-        padding: 6px 3px;
-      }
-      table, thead, tbody, th, td, tr {
-        display: block;
-      }
-      thead tr {
-        display: none;
-      }
-      tbody tr {
-        margin-bottom: 16px;
-        border-bottom: 2px solid #e6e4ff;
-      }
+      .admin-container { padding: 2vw; }
+      th, td { padding: 6px 3px; }
+      table, thead, tbody, th, td, tr { display: block; }
+      thead tr { display: none; }
+      tbody tr { margin-bottom: 16px; border-bottom: 2px solid #e6e4ff; }
       td {
-        text-align: right;
-        position: relative;
-        padding-left: 50%;
-        min-height: 36px;
-        border: none;
-        border-bottom: 1px solid #e6e4ff;
+        text-align: right; position: relative; padding-left: 50%; min-height: 36px;
+        border: none; border-bottom: 1px solid #e6e4ff;
       }
       td:before {
-        content: attr(data-label);
-        position: absolute;
-        left: 5px;
-        top: 7px;
-        font-weight: bold;
-        color: #4435a7;
-        text-align: left;
-        font-size: 0.97em;
+        content: attr(data-label); position: absolute; left: 5px; top: 7px;
+        font-weight: bold; color: #4435a7; text-align: left; font-size: 0.97em;
       }
     }
-    input, select, button {
-      min-height: 38px;
-      font-size: 1em;
-    }
+    input, select, button { min-height: 38px; font-size: 1em; }
   </style>
 </head>
 <body>
@@ -268,6 +191,31 @@
     </form>
   </div>
 
+  <!-- PROMOS/Vouchers Section -->
+  <div class="section">
+    <h3 style="margin-top:32px;">Promo / Voucher Codes</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Code</th>
+          <th>Discount (%)</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="promoTableBody"></tbody>
+    </table>
+    <form id="addPromoForm" autocomplete="off">
+      <input type="text" id="addPromoCode" placeholder="Code (e.g. SUMMER15)" required maxlength="16" style="width:110px;">
+      <input type="number" id="addPromoDiscount" placeholder="Discount" min="1" max="99" required style="width:60px;">
+      <select id="addPromoStatus" required>
+        <option value="active" selected>Active</option>
+        <option value="inactive">Inactive</option>
+      </select>
+      <button class="btn" type="submit">Add Promo</button>
+    </form>
+  </div>
+
   <!-- Orders Section -->
   <div class="section">
     <h3 style="margin-top:32px;">Orders</h3>
@@ -307,27 +255,65 @@ const db = getFirestore(app);
 
 const ASSETS_PATH = "Assets/contacts/";
 const AVAILABLE_IMAGES = [
-  "mooncream.jpg",
-  "x.svg",
-  "leaderboard.jpg",
-  "instagram.svg",
-  "trend1.jpg",
-  "trend2.jpg",
-  "trend3.jpg",
-  "discord.svg",
-  "facebook.svg"
+  "mooncream.jpg","x.svg","leaderboard.jpg","instagram.svg","trend1.jpg","trend2.jpg","trend3.jpg","discord.svg","facebook.svg"
 ];
 
-// Populate product image dropdown
-function renderAssetsOptions() {
-  const select = document.getElementById('addProdImg');
-  select.innerHTML = '<option value="" disabled selected>Image</option>';
-  AVAILABLE_IMAGES.forEach(img => {
-    select.innerHTML += `<option value="${img}">${img}</option>`;
+// PROMOS section
+let promos = [];
+function renderPromos() {
+  const body = document.getElementById('promoTableBody');
+  body.innerHTML = '';
+  promos.forEach(promo => {
+    body.innerHTML += `
+      <tr class="promo-row">
+        <td><input type="text" value="${promo.code}" id="pcode_${promo.id}" maxlength="16"></td>
+        <td><input type="number" value="${promo.discount}" id="pdiscount_${promo.id}" min="1" max="99"></td>
+        <td>
+          <select id="pstatus_${promo.id}">
+            <option value="active"${promo.status === "active" ? " selected" : ""}>Active</option>
+            <option value="inactive"${promo.status === "inactive" ? " selected" : ""}>Inactive</option>
+          </select>
+        </td>
+        <td>
+          <button class="btn save" onclick="window.savePromo('${promo.id}')">Save</button>
+          <button class="btn" onclick="window.deletePromo('${promo.id}')">Delete</button>
+        </td>
+      </tr>
+    `;
   });
 }
+onSnapshot(collection(db, "promos"), (snapshot) => {
+  promos = [];
+  snapshot.forEach(docSnap => {
+    promos.push({ id: docSnap.id, ...docSnap.data() });
+  });
+  renderPromos();
+});
+document.getElementById('addPromoForm').onsubmit = async function(e) {
+  e.preventDefault();
+  const code = document.getElementById('addPromoCode').value.trim().toUpperCase();
+  const discount = parseInt(document.getElementById('addPromoDiscount').value);
+  const status = document.getElementById('addPromoStatus').value;
+  if (!code || isNaN(discount) || discount < 1 || discount > 99) return alert("Invalid promo code or discount.");
+  if (promos.some(p => p.code === code)) { alert("Promo code already exists."); return; }
+  await addDoc(collection(db, "promos"), { code, discount, status });
+  document.getElementById('addPromoCode').value = '';
+  document.getElementById('addPromoDiscount').value = '';
+  document.getElementById('addPromoStatus').value = 'active';
+};
+window.savePromo = async function(id) {
+  const code = document.getElementById(`pcode_${id}`).value.trim().toUpperCase();
+  const discount = parseInt(document.getElementById(`pdiscount_${id}`).value);
+  const status = document.getElementById(`pstatus_${id}`).value;
+  if (!code || isNaN(discount) || discount < 1 || discount > 99) return alert("Invalid values.");
+  await updateDoc(doc(db, "promos", id), { code, discount, status });
+};
+window.deletePromo = async function(id) {
+  if (!confirm("Delete this promo code?")) return;
+  await deleteDoc(doc(db, "promos", id));
+};
 
-// --- Categories ---
+// CATEGORIES, PRODUCTS, ORDERS -- same as your current admin panel
 let categories = [];
 function renderCategories() {
   const body = document.getElementById('catTableBody');
@@ -345,15 +331,12 @@ function renderCategories() {
     `;
     body.appendChild(tr);
   });
-
   const select = document.getElementById('addProdCat');
   select.innerHTML = '<option value="" disabled selected>Category</option>';
   categories.forEach(cat => {
     select.innerHTML += `<option value="${cat.id}">${cat.name}</option>`;
   });
 }
-
-// Listen to Firestore categories
 onSnapshot(collection(db, "categories"), (snapshot) => {
   categories = [];
   snapshot.forEach(docSnap => {
@@ -362,7 +345,6 @@ onSnapshot(collection(db, "categories"), (snapshot) => {
   renderCategories();
   renderProducts();
 });
-
 window.updateCategory = async function(catId) {
   const inp = document.querySelector(`input.cat-edit-inp[data-id="${catId}"]`);
   if (inp && inp.value.trim()) {
@@ -381,7 +363,7 @@ document.getElementById('addCatForm').onsubmit = async function(e) {
   document.getElementById('newCatName').value = '';
 };
 
-// --- Products ---
+// PRODUCTS
 let products = [];
 function renderProducts() {
   const body = document.getElementById('prodTableBody');
@@ -416,7 +398,6 @@ function renderProducts() {
       </td>
     `;
     body.appendChild(tr);
-    // Add separator after each product row except the last one
     if (idx < products.length - 1) {
       const sepRow = document.createElement('tr');
       sepRow.innerHTML = `<td colspan="7"><hr class="product-separator"></td>`;
@@ -424,17 +405,14 @@ function renderProducts() {
     }
   });
 }
-
-// Listen to Firestore products
 onSnapshot(collection(db, "products"), (snapshot) => {
   products = [];
   snapshot.forEach(docSnap => {
     products.push({ id: docSnap.id, ...docSnap.data() });
   });
   renderProducts();
-  renderCategories(); // To update Delete buttons for category usage
+  renderCategories();
 });
-
 window.saveProduct = async function(id) {
   const prod = products.find(p=>p.id===id);
   if (!prod) return;
@@ -446,20 +424,16 @@ window.saveProduct = async function(id) {
     name, price, category, stock
   });
 };
-
 window.deleteProduct = async function(id) {
   if (!confirm("Delete this product?")) return;
   await deleteDoc(doc(db, "products", id));
 };
-
 window.toggleTrending = async function(id) {
   const prod = products.find(p=>p.id===id);
   if (prod) {
     await updateDoc(doc(db, "products", id), { trending: !prod.trending });
   }
 };
-
-// Add Product form
 document.getElementById('addProdForm').onsubmit = async function(e) {
   e.preventDefault();
   const category = document.getElementById('addProdCat').value;
@@ -483,14 +457,11 @@ document.getElementById('addProdForm').onsubmit = async function(e) {
   document.getElementById('addProdCat').selectedIndex = 0;
   document.getElementById('addProdTrend').checked = false;
 };
-
-// Initial assets dropdown
 renderAssetsOptions();
 
-// --- Orders ---
+// ORDERS
 let orders = [];
 const STATUS_LIST = ["pending", "done", "cancelled", "refund"];
-
 function renderOrders() {
   const body = document.getElementById('ordersTableBody');
   body.innerHTML = '';
@@ -517,7 +488,6 @@ function renderOrders() {
       </tr>
     `;
   });
-
   document.querySelectorAll('.order-status-sel').forEach(sel => {
     sel.onchange = async function() {
       const id = sel.getAttribute('data-id');
@@ -526,8 +496,6 @@ function renderOrders() {
     };
   });
 }
-
-// Listen to Firestore orders (latest first)
 onSnapshot(query(collection(db, "orders"), orderBy("created", "desc")), (snapshot) => {
   orders = [];
   snapshot.forEach(docSnap => {
@@ -535,8 +503,6 @@ onSnapshot(query(collection(db, "orders"), orderBy("created", "desc")), (snapsho
   });
   renderOrders();
 });
-
-// Delete order
 window.deleteOrder = async function(id) {
   if (!confirm("Delete this order?")) return;
   await deleteDoc(doc(db, "orders", id));

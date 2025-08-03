@@ -2,465 +2,716 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Grow Shop</title>
+  <title>Admin Panel - Grow Cart</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="style.css"> 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
-  <!-- PayPal JS SDK -->
-  <script src="https://www.paypal.com/sdk/js?client-id=Ab958gA183gsQzVGClcGqW98tY6b1OIXXokzvMhsO1iXpTahhi1ETjmPopZkH82j0skdngxKbHTkLS_r&currency=USD"></script>
-</head>
-<body>
-  <header class="shop-header">
-    <span class="brand">
-      <img src="your-logo.png" class="brand-logo" alt="Grow Shop Logo">
-      GROW CART
-    </span>
-    <button class="hamburger" aria-label="Menu" id="hamburgerBtn">&#9776;</button>
-    <nav class="shop-nav" id="shopNav">
-      <a href="#" id="navHome">Home</a>
-      <a href="#" id="navShop">Shop</a>
-      <a href="#" id="navAbout">About</a>
-      <a href="#" id="navContact">Contact</a>
-    </nav>
-    <button class="cart-fab" id="cartFab" aria-label="View cart">
-      🛒
-      <span class="cart-count">0</span>
-    </button>
-  </header>
-
-  <div class="cart-drawer" id="cartDrawer" tabindex="-1">
-    <button class="cart-close-btn" id="cartCloseBtn" aria-label="Close cart">&times;</button>
-    <h2>Your Cart</h2>
-    <div id="cartItems"></div>
-    <div class="cart-total" id="cartTotal"></div>
-
-    <form id="userInfoForm" autocomplete="off" style="margin:1em 0;">
-      <label style="font-size:.99em;display:block;margin-bottom:4px;">Roblox Username</label>
-      <input type="text" id="robloxUsername" required style="width:100%;font-size:1.15em;padding:10px;border-radius:6px;margin-bottom:0.5em;background:#222;color:#fff;border:2px solid #333;">
-      <label style="font-size:.99em;display:block;margin-top:18px;margin-bottom:4px;">Email</label>
-      <input type="email" id="userEmail" required style="width:100%;font-size:1.15em;padding:10px;border-radius:6px;margin-bottom:0.5em;background:#222;color:#fff;border:2px solid #333;">
-      <!-- Roblox preview removed -->
-    </form>
-    <div id="paypal-button-container" style="margin:16px 0;"></div>
-  </div>
-  
-  <section class="hero-trendings-section">
-    <div id="home" class="trendings-title">Trending Now!</div>
-    <div class="trendings-scroll" id="trendingsScroll"></div>
-  </section>
-
-  <div id="about" class="website-description">
-    <b>Retro Mart</b> is the official website marketplace by <b>Tenz</b> for our beloved players.<br><br>
-    Here, Niger players can safely buy, gain points, and discover unique in-game items, pets, and more to enhance their niger game.<br><br>
-    Shop with confidence, trade with friends, and help your garden flourish!
-  </div>
-
-  <div class="main-content">
-    <aside class="sidebar" id="sidebar">
-      <div class="sidebar-title">Categories</div>
-      <!-- Category buttons dynamically added by JS -->
-    </aside>
-    <section id="shop" class="products-area">
-      <div class="products-title">Featured Products</div>
-      <div class="product-grid" id="productGrid">
-        <!-- Product cards dynamically added by JS -->
-      </div>
-    </section>
-  </div>
-
-  <footer class="shop-footer" id="contact">
-    <div class="footer-content">
-      <span>&copy; 2023 Retro Mart. All rights reserved.</span>
-      <div>
-        <span>Follow us:</span>
-        <a href="https://twitter.com/your_twitter" class="social-link" target="_blank" aria-label="Twitter">
-          <img src="Assets/contacts/x.svg" alt="Twitter" class="footer-icon">
-        </a>
-        <a href="https://instagram.com/your_instagram" class="social-link" target="_blank" aria-label="Instagram">
-          <img src="Assets/contacts/instagram.svg" alt="Instagram" class="footer-icon">
-        </a>
-        <a href="https://facebook.com/your_facebook" class="social-link" target="_blank" aria-label="Facebook">
-          <img src="Assets/contacts/facebook.svg" alt="Facebook" class="footer-icon">
-        </a>
-        <a href="https://discord.gg/your_discord" class="social-link" target="_blank" aria-label="Discord">
-          <img src="Assets/contacts/discord.svg" alt="Discord" class="footer-icon">
-        </a>
-      </div>
-    </div>
-  </footer>
-
-  <!-- Firebase Firestore integration as ES Modules -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
-    import { getFirestore, collection, onSnapshot, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyC8ciuAyBxAEx29yeK756dhdrKI9ebD9gQ",
-      authDomain: "growcart-19ffd.firebaseapp.com",
-      projectId: "growcart-19ffd",
-      storageBucket: "growcart-19ffd.appspot.com",
-      messagingSenderId: "373536744308",
-      appId: "1:373536744308:web:5e43d8462dcd7f28e08221",
-      measurementId: "G-Q4JDQ62CMF"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-
-    const ASSETS_PATH = "Assets/contacts/";
-    let categories = [];
-    let products = [];
-
-    // --- Load categories and products from Firestore ---
-    function renderCategoriesSidebar() {
-      const sidebar = document.getElementById('sidebar');
-      sidebar.innerHTML = '<div class="sidebar-title">Categories</div>';
-      // "All" button
-      const allBtn = document.createElement('button');
-      allBtn.className = 'sidebar-btn active';
-      allBtn.dataset.category = 'all';
-      allBtn.textContent = 'All';
-      sidebar.appendChild(allBtn);
-
-      allBtn.onclick = () => {
-        document.querySelectorAll('.sidebar-btn').forEach(b => b.classList.remove('active'));
-        allBtn.classList.add('active');
-        renderProductsGrid('all');
-      };
-
-      categories.forEach(cat => {
-        const btn = document.createElement('button');
-        btn.className = 'sidebar-btn';
-        btn.dataset.category = cat.id;
-        btn.textContent = cat.name;
-        btn.onclick = () => {
-          document.querySelectorAll('.sidebar-btn').forEach(b => b.classList.remove('active'));
-          btn.classList.add('active');
-          renderProductsGrid(cat.id);
-        };
-        sidebar.appendChild(btn);
-      });
-    }
-
-    function renderProductsGrid(filterCat = 'all') {
-      const grid = document.getElementById('productGrid');
-      grid.innerHTML = '';
-      products.forEach(prod => {
-        if (filterCat !== 'all' && prod.category !== filterCat) return;
-        const card = document.createElement('div');
-        card.className = 'product-card';
-        card.dataset.category = prod.category;
-        card.dataset.id = prod.id;
-        card.dataset.title = prod.name;
-        card.dataset.price = prod.price;
-        card.dataset.img = ASSETS_PATH + prod.image;
-
-        card.innerHTML = `
-          <div class="product-img-box">
-            <img src="${ASSETS_PATH + prod.image}" alt="${prod.name}" class="product-img">
-            <div class="img-placeholder" style="display:none;"><span>${prod.name}</span></div>
-          </div>
-          <div class="product-main-title">${prod.name}</div>
-          <div class="product-price">$${prod.price}</div>
-          <button class="product-btn">Add to Cart</button>
-        `;
-        grid.appendChild(card);
-      });
-
-      // Add robust image onerror handler after rendering
-      document.querySelectorAll('.product-img').forEach(img => {
-        img.onerror = function() {
-          this.style.display = 'none';
-          var p = this.parentNode.querySelector('.img-placeholder');
-          if (p) p.style.display = 'flex';
-        };
-      });
-
-      // Re-attach listeners
-      document.querySelectorAll('.product-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-          const card = btn.closest('.product-card');
-          const id = card.getAttribute('data-id');
-          const title = card.getAttribute('data-title');
-          const price = parseFloat(card.getAttribute('data-price'));
-          const img = card.getAttribute('data-img');
-          if(cart[id]) cart[id].qty += 1;
-          else cart[id] = {id, title, price, img, qty: 1};
-          updateCartDisplayWithPayPal();
-        });
-      });
-    }
-
-    function renderTrendingProducts() {
-      const trendingsScroll = document.getElementById('trendingsScroll');
-      trendingsScroll.innerHTML = '';
-      products.filter(p => p.trending).forEach((prod, idx) => {
-        const card = document.createElement('div');
-        card.className = 'trending-card';
-        card.innerHTML = `
-          <div style="position:relative;width:95%;height:90px;">
-            <img src="${ASSETS_PATH + prod.image}" alt="Trending ${idx+1}" class="product-img">
-            <div class="img-placeholder" style="display:none;">Trend<br>${idx+1}</div>
-          </div>
-          <div class="trending-card-title">${prod.name}</div>
-          <div class="trending-card-price">$${prod.price}</div>
-        `;
-        trendingsScroll.appendChild(card);
-      });
-
-      document.querySelectorAll('.product-img').forEach(img => {
-        img.onerror = function() {
-          this.style.display = 'none';
-          var p = this.parentNode.querySelector('.img-placeholder');
-          if (p) p.style.display = 'flex';
-        };
-      });
-    }
-
-    // Firestore live sync
-    onSnapshot(collection(db, "categories"), snapshot => {
-      categories = [];
-      snapshot.forEach(docSnap => {
-        categories.push({ id: docSnap.id, ...docSnap.data() });
-      });
-      renderCategoriesSidebar();
-      renderProductsGrid(document.querySelector('.sidebar-btn.active')?.dataset.category || 'all');
-    });
-
-    onSnapshot(collection(db, "products"), snapshot => {
-      products = [];
-      snapshot.forEach(docSnap => {
-        products.push({ id: docSnap.id, ...docSnap.data() });
-      });
-      renderProductsGrid(document.querySelector('.sidebar-btn.active')?.dataset.category || 'all');
-      renderTrendingProducts();
-    });
-
-    // --- Cart code ---
-    let cart = {};
-    const cartFab = document.getElementById('cartFab');
-    const cartDrawer = document.getElementById('cartDrawer');
-    const cartCloseBtn = document.getElementById('cartCloseBtn');
-    const cartItemsDiv = document.getElementById('cartItems');
-    const cartTotalDiv = document.getElementById('cartTotal');
-    // form fields
-    const robloxInput = document.getElementById('robloxUsername');
-    const userEmail = document.getElementById('userEmail');
-
-    function updateCartDisplay() {
-      let count = 0;
-      let total = 0;
-      cartItemsDiv.innerHTML = '';
-      Object.values(cart).forEach(item => {
-        count += item.qty;
-        total += item.qty * item.price;
-      });
-      document.querySelectorAll('.cart-count').forEach(span => {
-        span.textContent = count;
-      });
-
-      if(count === 0) {
-        cartItemsDiv.innerHTML = '<div class="cart-empty">Your cart is empty!</div>';
-        cartTotalDiv.textContent = '';
-        renderPayPalButton(); // Ensure PayPal button is cleared when cart is empty
-        return;
-      }
-      Object.values(cart).forEach(item => {
-        const el = document.createElement('div');
-        el.className = 'cart-item';
-        el.innerHTML = `
-          <div style="position:relative;width:48px;height:48px;">
-            <img class="cart-item-img" src="${item.img}" alt="${item.title}">
-            <div class="img-placeholder" style="display:none;"><span>${item.title}</span></div>
-          </div>
-          <div class="cart-item-title">${item.title}</div>
-          <div class="cart-item-price">$${(item.price*item.qty).toFixed(2)}</div>
-          <button class="cart-remove-btn" data-id="${item.id}">&times;</button>
-        `;
-        cartItemsDiv.appendChild(el);
-      });
-
-      // Robust image error handler
-      document.querySelectorAll('.cart-item-img').forEach(img => {
-        img.onerror = function() {
-          this.style.display = 'none';
-          var p = this.parentNode.querySelector('.img-placeholder');
-          if (p) p.style.display = 'flex';
-        };
-      });
-
-      cartTotalDiv.textContent = `Total: $${total.toFixed(2)}`;
-      Array.from(cartItemsDiv.querySelectorAll('.cart-remove-btn')).forEach(btn => {
-        btn.onclick = () => {
-          const id = btn.getAttribute('data-id');
-          delete cart[id];
-          updateCartDisplayWithPayPal();
-        };
-      });
-    }
-
-    cartFab.onclick = () => { cartDrawer.classList.add('open'); };
-    cartCloseBtn.onclick = () => { cartDrawer.classList.remove('open'); };
-
-    // --- Firestore & Discord webhook ---
-    async function firestoreOrder(order) {
-      await addDoc(collection(db, "orders"), {
-        ...order,
-        created: serverTimestamp(),
-      });
-    }
-
-    async function sendDiscordWebhook(order) {
-      // Replace with your own webhook
-      const webhookUrl = "https://discord.com/api/webhooks/1401496117451161683/-2Gwo7rWdNYPPIwQ6Tg5K-fmjU8xxl5uMfS9AMjW_GWLOfrRYRpe2mkWFZc6zZvZGbpr";
-      await fetch(webhookUrl, {
-        method: "POST",
-        headers: {"Content-Type":"application/json"},
-        body: JSON.stringify({
-          content: `**New Order!**
-**Roblox:** ${order.robloxUsername}
-**Email:** ${order.email}
-**Items:** ${order.items.map(i=>`\`${i.title}\` x${i.qty}`).join(", ")}
-**Total:** $${order.total}`
-        })
-      });
-    }
-
-    // --- PayPal Integration ---
-    function getCartItemsArray() {
-      return Object.values(cart).map(item => ({
-        name: item.title,
-        unit_amount: { currency_code: "USD", value: item.price.toFixed(2) },
-        quantity: item.qty.toString()
-      }));
-    }
-    function getCartTotal() {
-      return Object.values(cart).reduce((sum, item) => sum + item.price * item.qty, 0).toFixed(2);
-    }
-    function renderPayPalButton() {
-      const btnDiv = document.getElementById('paypal-button-container');
-      btnDiv.innerHTML = '';
-      if (Object.keys(cart).length === 0) return;
-      if (typeof paypal === "undefined" || !btnDiv) {
-        setTimeout(renderPayPalButton, 200);
-        return;
-      }
-      paypal.Buttons({
-        createOrder: function(data, actions) {
-          // Validate form
-          if (!robloxInput.value.trim() || !userEmail.value.trim()) {
-            alert("Please enter your Roblox username and email.");
-            return;
-          }
-          return actions.order.create({
-            purchase_units: [{
-              amount: {
-                currency_code: "USD",
-                value: getCartTotal(),
-                breakdown: {
-                  item_total: { currency_code: "USD", value: getCartTotal() }
-                }
-              },
-              items: getCartItemsArray()
-            }]
-          });
-        },
-        onApprove: function(data, actions) {
-          return actions.order.capture().then(async function(details) {
-            // Send to Firestore and Discord
-            const order = {
-              robloxUsername: robloxInput.value.trim(),
-              email: userEmail.value.trim(),
-              items: Object.values(cart),
-              total: getCartTotal(),
-              paypalOrderId: data.orderID,
-              payer: details.payer,
-            };
-            await firestoreOrder(order);
-            await sendDiscordWebhook(order);
-            alert("Payment complete! Thank you, " + details.payer.name.given_name + ".");
-            cart = {};
-            updateCartDisplayWithPayPal();
-            robloxInput.value = "";
-            userEmail.value = "";
-          });
-        }
-      }).render('#paypal-button-container');
-    }
-    function updateCartDisplayWithPayPal() {
-      updateCartDisplay();
-      renderPayPalButton();
-    }
-    window.updateCartDisplay = updateCartDisplayWithPayPal;
-    document.addEventListener('DOMContentLoaded', updateCartDisplayWithPayPal);
-
-    // --- SMOOTH NAVIGATION WITH CUSTOM ANIMATION ---
-    function slowScrollToElement(targetId, offset = 0, duration = 1000) {
-      const target = document.getElementById(targetId);
-      if (!target) return;
-      const headerOffset = document.querySelector('header').offsetHeight || 0;
-      const elementPosition = target.getBoundingClientRect().top + window.pageYOffset - headerOffset + offset;
-      const startPosition = window.pageYOffset;
-      const distance = elementPosition - startPosition;
-      let start = null;
-
-      function easeInOutQuad(t, b, c, d) {
-        t /= d/2;
-        if (t < 1) return c/2*t*t + b;
-        t--;
-        return -c/2 * (t*(t-2) - 1) + b;
-      }
-
-      function animateScroll(timestamp) {
-        if (!start) start = timestamp;
-        const elapsed = timestamp - start;
-        const run = easeInOutQuad(elapsed, startPosition, distance, duration);
-        window.scrollTo(0, run);
-        if (elapsed < duration) {
-          requestAnimationFrame(animateScroll);
-        } else {
-          window.scrollTo(0, elementPosition);
-        }
-      }
-      requestAnimationFrame(animateScroll);
-    }
-    document.getElementById('navHome').addEventListener('click', function(e) {
-      e.preventDefault(); slowScrollToElement('home', 0, 800);
-    });
-    document.getElementById('navShop').addEventListener('click', function(e) {
-      e.preventDefault(); slowScrollToElement('shop', 0, 800);
-    });
-    document.getElementById('navAbout').addEventListener('click', function(e) {
-      e.preventDefault(); slowScrollToElement('about', 0, 800);
-    });
-    document.getElementById('navContact').addEventListener('click', function(e) {
-      e.preventDefault(); slowScrollToElement('contact', 0, 800);
-    });
-
-    // --- Cart Empty Animation ---
-    function animateCartEmpty() {
-      cartDrawer.classList.remove('cart-empty-anim');
-      void cartDrawer.offsetWidth;
-      cartDrawer.classList.add('cart-empty-anim');
-      setTimeout(() => { cartDrawer.classList.remove('cart-empty-anim'); }, 700);
-      cartDrawer.focus && cartDrawer.focus();
-    }
-  </script>
   <style>
-    .cart-drawer.cart-empty-anim {
-      animation: cartShake 0.42s cubic-bezier(.36,.07,.19,.97) both;
-      border-left: 3px solid #d18484 !important;
-      box-shadow: -8px 0 24px #e156796c, 0 0 0 4px #fff8e1 inset;
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #f7f6ff;
+      margin: 0;
+      padding: 0;
     }
-    @keyframes cartShake {
-      10%, 90% { transform: translateX(-2px); }
-      20%, 80% { transform: translateX(4px); }
-      30%, 50%, 70% { transform: translateX(-8px); }
-      40%, 60% { transform: translateX(8px); }
-      100% { transform: translateX(0); }
+    .admin-container {
+      max-width: 900px;
+      margin: 30px auto;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 6px 32px #bcbbe6a0;
+      padding: 24px;
+    }
+    h2 {
+      margin-top: 0;
+      color: #4435a7;
+    }
+    .section {
+      margin-bottom: 32px;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin-bottom: 12px;
+      font-size: 1em;
+    }
+    th, td {
+      padding: 8px;
+      border: 1px solid #dad0ff;
+      text-align: left;
+      background: #fff;
+    }
+    th {
+      background: #e6e4ff;
+    }
+    tbody tr {
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 1px 5px #e6e4ffa8;
+      margin-bottom: 12px;
+      transition: box-shadow 0.13s;
+    }
+    tbody tr:not(:last-child) {
+      border-bottom: 3px solid #edeaff;
+    }
+    tbody tr:hover {
+      background: #f7f4ff;
+      box-shadow: 0 2px 12px #bcbbe660;
+    }
+    input, select {
+      padding: 6px;
+      border-radius: 4px;
+      border: 1px solid #bfbfbf;
+      background: #f9f8ff;
+      font-size: 1em;
+      margin-right: 4px;
+    }
+    .btn {
+      padding: 6px 16px;
+      background: #6c5ce7;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      margin: 2px;
+      font-weight: 600;
+      transition: background .15s;
+    }
+    .btn.save {
+      background: #00b894;
+    }
+    .btn.save:hover {
+      background: #009170;
+    }
+    .btn:hover {
+      background: #4435a7;
+    }
+    .img-preview {
+      width: 48px;
+      height: 48px;
+      object-fit: cover;
+      border-radius: 4px;
+      background: #e6e4ff;
+      display: inline-block;
+    }
+    .category-label {
+      padding: 2px 6px;
+      border-radius: 3px;
+      background: #e6e4ff;
+      color: #4435a7;
+      font-size: .92em;
+      white-space: nowrap;
+    }
+    .trending-toggle {
+      font-size: 1.1em;
+      cursor: pointer;
+      color: #e17055;
+    }
+    .product-actions {
+      display: flex;
+      flex-direction: row;
+      gap: 8px;
+      align-items: center;
+      justify-content: flex-start;
+    }
+    .product-separator {
+      border: none;
+      border-bottom: 2px solid #eceafd;
+      margin: 18px 0 10px 0;
+      width: 100%;
+    }
+    .cat-saved {
+      display: none;
+      color: #00b894;
+      margin-left: 6px;
+      font-size: 1.3em;
+    }
+    .order-filter-btns {
+      margin-bottom: 15px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .order-filter-btn {
+      padding: 6px 14px;
+      background: #e6e4ff;
+      color: #4435a7;
+      border: 0;
+      border-radius: 3px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .13s;
+    }
+    .order-filter-btn.active, .order-filter-btn:active {
+      background: #6c5ce7;
+      color: #fff;
+    }
+    @media (max-width: 860px) {
+      .admin-container {
+        margin: 10px;
+        padding: 10px;
+        max-width: 100vw;
+      }
+    }
+    @media (max-width: 700px) {
+      .admin-container {
+        padding: 3vw;
+        margin: 0;
+        border-radius: 0;
+        box-shadow: none;
+      }
+      table, th, td {
+        font-size: .96em;
+      }
+      .img-preview {
+        width: 32px;
+        height: 32px;
+      }
+      form input, form select, form button {
+        display: block;
+        width: 100%;
+        margin: 5px 0;
+        box-sizing: border-box;
+      }
+      form label {
+        display: inline-block;
+        margin-bottom: 3px;
+      }
+      .btn {
+        width: 100%;
+        margin: 0 0 8px 0;
+        min-width: unset;
+      }
+      .product-actions {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+        width: 100%;
+      }
+      table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+      }
+      tbody tr {
+        margin-bottom: 18px;
+      }
+      .order-filter-btns {
+        gap: 4px;
+      }
+    }
+    @media (max-width: 500px) {
+      .admin-container {
+        padding: 2vw;
+      }
+      th, td {
+        padding: 6px 3px;
+      }
+      table, thead, tbody, th, td, tr {
+        display: block;
+      }
+      thead tr {
+        display: none;
+      }
+      tbody tr {
+        margin-bottom: 16px;
+        border-bottom: 2px solid #e6e4ff;
+      }
+      td {
+        text-align: right;
+        position: relative;
+        padding-left: 50%;
+        min-height: 36px;
+        border: none;
+        border-bottom: 1px solid #e6e4ff;
+      }
+      td:before {
+        content: attr(data-label);
+        position: absolute;
+        left: 5px;
+        top: 7px;
+        font-weight: bold;
+        color: #4435a7;
+        text-align: left;
+        font-size: 0.97em;
+      }
+    }
+    input, select, button {
+      min-height: 38px;
+      font-size: 1em;
     }
   </style>
+</head>
+<body>
+<div class="admin-container">
+  <h2>Retro Mart Admin Panel</h2>
+  
+  <!-- Categories Section -->
+  <div class="section">
+    <h3>Categories</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="catTableBody"></tbody>
+    </table>
+    <form id="addCatForm" style="margin-top:8px;">
+      <input type="text" id="newCatName" placeholder="New category name" required>
+      <button class="btn" type="submit">Add Category</button>
+    </form>
+  </div>
+
+  <!-- Promo Codes Section -->
+  <div class="section">
+    <h3>Promo Codes</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Code</th>
+          <th>Discount (%)</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="promoTableBody"></tbody>
+    </table>
+    <form id="addPromoForm" style="margin-top:8px;">
+      <input type="text" id="newPromoCode" placeholder="Promo code" required style="text-transform:uppercase;">
+      <input type="number" id="newPromoDiscount" placeholder="Discount %" min="1" max="100" required>
+      <select id="newPromoStatus">
+        <option value="active" selected>Active</option>
+        <option value="inactive">Inactive</option>
+      </select>
+      <button class="btn" type="submit">Add Promo</button>
+    </form>
+  </div>
+  
+  <!-- Products Section -->
+  <div class="section">
+    <h3 style="margin-top:32px;">Products</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Preview</th>
+          <th>Name</th>
+          <th>Price ($)</th>
+          <th>Category</th>
+          <th>Stock</th>
+          <th>Trending</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="prodTableBody"></tbody>
+    </table>
+    <form id="addProdForm" autocomplete="off">
+      <select id="addProdCat" required>
+        <option value="" disabled selected>Category</option>
+      </select>
+      <input type="text" id="addProdName" placeholder="Product name" required>
+      <input type="number" id="addProdPrice" placeholder="Price" min="0" step="0.01" required>
+      <input type="number" id="addProdStock" placeholder="Stock" min="0" step="1" required>
+      <!-- Image dropdown -->
+      <select id="addProdImg" required>
+        <option value="" disabled selected>Image</option>
+      </select>
+      <label><input type="checkbox" id="addProdTrend"> Trending?</label>
+      <button class="btn" type="submit">Add Product</button>
+    </form>
+  </div>
+
+  <!-- Orders Section -->
+  <div class="section">
+    <h3 style="margin-top:32px;">Orders</h3>
+    <div class="order-filter-btns" id="orderFilterBtns"></div>
+    <table>
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Roblox Username</th>
+          <th>Email</th>
+          <th>Items</th>
+          <th>Total ($)</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="ordersTableBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+import { getFirestore, collection, addDoc, doc, onSnapshot, deleteDoc, updateDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyC8ciuAyBxAEx29yeK756dhdrKI9ebD9gQ",
+  authDomain: "growcart-19ffd.firebaseapp.com",
+  projectId: "growcart-19ffd",
+  storageBucket: "growcart-19ffd.appspot.com",
+  messagingSenderId: "373536744308",
+  appId: "1:373536744308:web:5e43d8462dcd7f28e08221",
+  measurementId: "G-Q4JDQ62CMF"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+const ASSETS_PATH = "Assets/contacts/";
+const AVAILABLE_IMAGES = [
+  "mooncream.jpg",
+  "x.svg",
+  "leaderboard.jpg",
+  "instagram.svg",
+  "trend1.jpg",
+  "trend2.jpg",
+  "trend3.jpg",
+  "discord.svg",
+  "facebook.svg"
+];
+
+// Populate product image dropdown
+function renderAssetsOptions() {
+  const select = document.getElementById('addProdImg');
+  select.innerHTML = '<option value="" disabled selected>Image</option>';
+  AVAILABLE_IMAGES.forEach(img => {
+    select.innerHTML += `<option value="${img}">${img}</option>`;
+  });
+}
+
+// --- Categories ---
+let categories = [];
+function renderCategories() {
+  const body = document.getElementById('catTableBody');
+  body.innerHTML = '';
+  categories.forEach(cat => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td data-label="Name">
+        <input type="text" value="${cat.name}" data-id="${cat.id}" style="width:83%;" class="cat-edit-inp">
+        <span class="cat-saved" style="display:none;color:#00b894;margin-left:6px;font-size:1.3em;">✔️</span>
+      </td>
+      <td data-label="Actions">
+        <button class="btn" onclick="window.updateCategory('${cat.id}', this)">Save</button>
+        <button class="btn" onclick="window.deleteCategory('${cat.id}')">Delete</button>
+      </td>
+    `;
+    body.appendChild(tr);
+
+    // Add event listeners for auto-save
+    const inp = tr.querySelector('input.cat-edit-inp');
+    const savedMark = tr.querySelector('.cat-saved');
+
+    inp.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        window.updateCategory(cat.id, null, savedMark);
+        inp.blur();
+      }
+    });
+    inp.addEventListener('blur', function() {
+      window.updateCategory(cat.id, null, savedMark);
+    });
+  });
+
+  // Populate add product category dropdown
+  const select = document.getElementById('addProdCat');
+  select.innerHTML = '<option value="" disabled selected>Category</option>';
+  categories.forEach(cat => {
+    select.innerHTML += `<option value="${cat.id}">${cat.name}</option>`;
+  });
+}
+
+// Listen to Firestore categories
+onSnapshot(collection(db, "categories"), (snapshot) => {
+  categories = [];
+  snapshot.forEach(docSnap => {
+    categories.push({ id: docSnap.id, ...docSnap.data() });
+  });
+  renderCategories();
+  renderProducts();
+});
+
+window.updateCategory = async function(catId, btn, savedMark) {
+  const inp = document.querySelector(`input.cat-edit-inp[data-id="${catId}"]`);
+  if (inp && inp.value.trim()) {
+    await updateDoc(doc(db, "categories", catId), { name: inp.value.trim() });
+    if (savedMark) {
+      savedMark.style.display = "inline";
+      setTimeout(() => { savedMark.style.display = "none"; }, 900);
+    }
+  }
+};
+window.deleteCategory = async function(catId) {
+  if (!confirm("Delete this category? All products under this category will become uncategorized.")) return;
+  const affected = products.filter(p => p.category === catId);
+  for (const prod of affected) {
+    await updateDoc(doc(db, "products", prod.id), { category: "" });
+  }
+  await deleteDoc(doc(db, "categories", catId));
+};
+document.getElementById('addCatForm').onsubmit = async function(e) {
+  e.preventDefault();
+  const val = document.getElementById('newCatName').value.trim();
+  if (!val) return;
+  await addDoc(collection(db, "categories"), { name: val });
+  document.getElementById('newCatName').value = '';
+};
+
+// --- PROMO CODES ---
+let promos = [];
+function renderPromos() {
+  const body = document.getElementById('promoTableBody');
+  body.innerHTML = '';
+  promos.forEach(promo => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td data-label="Code">
+        <input type="text" value="${promo.code}" data-id="${promo.id}" style="width:80px;text-transform:uppercase;" class="promo-edit-code">
+      </td>
+      <td data-label="Discount (%)">
+        <input type="number" min="1" max="100" value="${promo.discount}" data-id="${promo.id}" class="promo-edit-discount" style="width:60px;">
+      </td>
+      <td data-label="Status">
+        <select data-id="${promo.id}" class="promo-edit-status">
+          <option value="active" ${promo.status==="active"?"selected":""}>Active</option>
+          <option value="inactive" ${promo.status==="inactive"?"selected":""}>Inactive</option>
+        </select>
+      </td>
+      <td data-label="Actions">
+        <button class="btn" onclick="window.updatePromo('${promo.id}')">Save</button>
+        <button class="btn" onclick="window.deletePromo('${promo.id}')">Delete</button>
+      </td>
+    `;
+    body.appendChild(tr);
+  });
+}
+
+onSnapshot(collection(db, "promos"), (snapshot) => {
+  promos = [];
+  snapshot.forEach(docSnap => {
+    promos.push({ id: docSnap.id, ...docSnap.data() });
+  });
+  renderPromos();
+});
+
+window.updatePromo = async function(promoId) {
+  const code = document.querySelector(`.promo-edit-code[data-id="${promoId}"]`).value.trim().toUpperCase();
+  const discount = parseInt(document.querySelector(`.promo-edit-discount[data-id="${promoId}"]`).value, 10) || 0;
+  const status = document.querySelector(`.promo-edit-status[data-id="${promoId}"]`).value;
+  await updateDoc(doc(db, "promos", promoId), { code, discount, status });
+};
+
+window.deletePromo = async function(promoId) {
+  if (!confirm("Delete this promo code?")) return;
+  await deleteDoc(doc(db, "promos", promoId));
+};
+
+document.getElementById('addPromoForm').onsubmit = async function(e) {
+  e.preventDefault();
+  const code = document.getElementById('newPromoCode').value.trim().toUpperCase();
+  const discount = parseInt(document.getElementById('newPromoDiscount').value, 10) || 0;
+  const status = document.getElementById('newPromoStatus').value;
+  if (!code || !discount) return;
+  await addDoc(collection(db, "promos"), { code, discount, status });
+  document.getElementById('newPromoCode').value = '';
+  document.getElementById('newPromoDiscount').value = '';
+  document.getElementById('newPromoStatus').value = 'active';
+};
+
+// --- Products ---
+let products = [];
+function renderProducts() {
+  const body = document.getElementById('prodTableBody');
+  body.innerHTML = '';
+  products.forEach((prod, idx) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td data-label="Preview"><img class="img-preview" src="${ASSETS_PATH + prod.image}" alt="" onerror="this.src='${ASSETS_PATH}placeholder.jpg'"></td>
+      <td data-label="Name">
+        <input type="text" value="${prod.name}" id="prodname_${prod.id}" style="width:94%;">
+      </td>
+      <td data-label="Price ($)">
+        <input type="number" min="0" step="0.01" value="${prod.price}" id="prodprice_${prod.id}" style="width:70px;">
+      </td>
+      <td data-label="Category">
+        <select id="prodcat_${prod.id}">
+          ${categories.map(c=>`<option value="${c.id}" ${c.id===prod.category?'selected':''}>${c.name}</option>`).join('')}
+        </select>
+      </td>
+      <td data-label="Stock">
+        <input type="number" min="0" step="1" value="${prod.stock||0}" id="prodstk_${prod.id}" style="width:60px;">
+      </td>
+      <td data-label="Trending">
+        <span class="trending-toggle" onclick="window.toggleTrending('${prod.id}')">${prod.trending?'⭐️':'☆'}</span>
+      </td>
+      <td data-label="Actions">
+        <div class="product-actions">
+          <button class="btn save" onclick="window.saveProduct('${prod.id}')">Save</button>
+          <button class="btn" onclick="window.deleteProduct('${prod.id}')">Delete</button>
+        </div>
+      </td>
+    `;
+    body.appendChild(tr);
+    if (idx < products.length - 1) {
+      const sepRow = document.createElement('tr');
+      sepRow.innerHTML = `<td colspan="7"><hr class="product-separator"></td>`;
+      body.appendChild(sepRow);
+    }
+  });
+}
+
+onSnapshot(collection(db, "products"), (snapshot) => {
+  products = [];
+  snapshot.forEach(docSnap => {
+    products.push({ id: docSnap.id, ...docSnap.data() });
+  });
+  renderProducts();
+  renderCategories();
+});
+
+window.saveProduct = async function(id) {
+  const prod = products.find(p=>p.id===id);
+  if (!prod) return;
+  const name = document.getElementById(`prodname_${id}`).value.trim();
+  const price = parseFloat(document.getElementById(`prodprice_${id}`).value) || 0;
+  const category = document.getElementById(`prodcat_${id}`).value;
+  const stock = parseInt(document.getElementById(`prodstk_${id}`).value) || 0;
+  await updateDoc(doc(db, "products", id), {
+    name, price, category, stock
+  });
+};
+
+window.deleteProduct = async function(id) {
+  if (!confirm("Delete this product?")) return;
+  await deleteDoc(doc(db, "products", id));
+};
+
+window.toggleTrending = async function(id) {
+  const prod = products.find(p=>p.id===id);
+  if (prod) {
+    await updateDoc(doc(db, "products", id), { trending: !prod.trending });
+  }
+};
+
+document.getElementById('addProdForm').onsubmit = async function(e) {
+  e.preventDefault();
+  const category = document.getElementById('addProdCat').value;
+  const name = document.getElementById('addProdName').value.trim();
+  const price = parseFloat(document.getElementById('addProdPrice').value);
+  const stock = parseInt(document.getElementById('addProdStock').value) || 0;
+  const trending = document.getElementById('addProdTrend').checked;
+  const img = document.getElementById('addProdImg').value;
+
+  if (!name || isNaN(price) || !category || isNaN(stock) || !img)
+    return alert("Fill all fields and select image");
+
+  await addDoc(collection(db, "products"), {
+    name, price, category, stock, trending, image: img
+  });
+
+  document.getElementById('addProdName').value = '';
+  document.getElementById('addProdPrice').value = '';
+  document.getElementById('addProdStock').value = '';
+  document.getElementById('addProdImg').selectedIndex = 0;
+  document.getElementById('addProdCat').selectedIndex = 0;
+  document.getElementById('addProdTrend').checked = false;
+};
+
+// Initial assets dropdown
+renderAssetsOptions();
+
+// --- Orders ---
+let orders = [];
+const STATUS_LIST = ["pending", "done", "cancelled", "refund"];
+
+const ORDER_FILTERS = [
+  { label: "All", value: "all" },
+  { label: "Pending", value: "pending" },
+  { label: "Done", value: "done" },
+  { label: "Cancelled", value: "cancelled" },
+  { label: "Refunded", value: "refund" }
+];
+let orderFilter = "all";
+
+function renderOrderFilterBtns() {
+  const btnsDiv = document.getElementById("orderFilterBtns");
+  btnsDiv.innerHTML = "";
+  ORDER_FILTERS.forEach(f => {
+    const btn = document.createElement("button");
+    btn.className = "order-filter-btn" + (orderFilter === f.value ? " active" : "");
+    btn.textContent = f.label;
+    btn.onclick = () => {
+      orderFilter = f.value;
+      renderOrders();
+      renderOrderFilterBtns();
+    };
+    btnsDiv.appendChild(btn);
+  });
+}
+renderOrderFilterBtns();
+
+function renderOrders() {
+  const body = document.getElementById('ordersTableBody');
+  body.innerHTML = '';
+  let displayOrders = [...orders];
+  if (orderFilter !== "all") {
+    displayOrders = displayOrders.filter(o => (o.status || "pending") === orderFilter);
+  }
+  const statusSortOrder = { pending: 0, done: 1, cancelled: 2, refund: 3 };
+  displayOrders.sort((a, b) => {
+    const sa = statusSortOrder[a.status || "pending"] ?? 99;
+    const sb = statusSortOrder[b.status || "pending"] ?? 99;
+    if (sa !== sb) return sa - sb;
+    const ta = a.created?.seconds || 0;
+    const tb = b.created?.seconds || 0;
+    return tb - ta;
+  });
+  displayOrders.forEach(order => {
+    const itemsHtml = order.items && Array.isArray(order.items)
+      ? order.items.map(i => `<div>${i.title} x${i.qty}</div>`).join('')
+      : '';
+    const statusSel = `
+      <select data-id="${order.id}" class="order-status-sel">
+        ${STATUS_LIST.map(s => `<option value="${s}" ${s === order.status ? 'selected' : ''}>${s.charAt(0).toUpperCase() + s.slice(1)}</option>`).join('')}
+      </select>
+    `;
+    body.innerHTML += `
+      <tr>
+        <td data-label="Date">${order.created?.toDate ? order.created.toDate().toLocaleString() : ''}</td>
+        <td data-label="Roblox Username">${order.robloxUsername || ''}</td>
+        <td data-label="Email">${order.email || ''}</td>
+        <td data-label="Items">${itemsHtml}</td>
+        <td data-label="Total ($)">$${order.total}</td>
+        <td data-label="Status">${statusSel}</td>
+        <td data-label="Actions">
+          <button class="btn" onclick="window.deleteOrder('${order.id}')">Delete</button>
+        </td>
+      </tr>
+    `;
+  });
+
+  document.querySelectorAll('.order-status-sel').forEach(sel => {
+    sel.onchange = async function() {
+      const id = sel.getAttribute('data-id');
+      const newStatus = sel.value;
+      await updateDoc(doc(db, "orders", id), { status: newStatus });
+    };
+  });
+}
+
+onSnapshot(query(collection(db, "orders"), orderBy("created", "desc")), (snapshot) => {
+  orders = [];
+  snapshot.forEach(docSnap => {
+    orders.push({ id: docSnap.id, ...docSnap.data() });
+  });
+  renderOrders();
+});
+
+window.deleteOrder = async function(id) {
+  if (!confirm("Delete this order?")) return;
+  await deleteDoc(doc(db, "orders", id));
+};
+</script>
 </body>
 </html>
