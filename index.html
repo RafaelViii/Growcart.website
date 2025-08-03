@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Grow Shop</title>
+  <!-- updated codess -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css"> 
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- Cloud background -->
+  <div class="cloud-bg" aria-hidden="true">
+    <svg class="cloud1" viewBox="0 0 100 40"><ellipse cx="50" cy="20" rx="48" ry="18" fill="#fff" opacity="0.45"/></svg>
+    <svg class="cloud2" viewBox="0 0 100 40"><ellipse cx="50" cy="20" rx="39" ry="13" fill="#fff" opacity="0.26"/></svg>
+    <svg class="cloud3" viewBox="0 0 100 40"><ellipse cx="50" cy="20" rx="30" ry="12" fill="#fff" opacity="0.22"/></svg>
+    <svg class="cloud4" viewBox="0 0 100 40"><ellipse cx="50" cy="20" rx="33" ry="10" fill="#fff" opacity="0.13"/></svg>
+    <svg class="cloud5" viewBox="0 0 100 40"><ellipse cx="50" cy="20" rx="28" ry="9" fill="#fff" opacity="0.11"/></svg>
+  </div>
+  <header class="shop-header">
+    <span class="brand">
+      <img src="your-logo.png" class="brand-logo" alt="Grow Shop Logo">
+      GROW CART
+    </span>
+    
+    <button class="hamburger" aria-label="Menu" id="hamburgerBtn">&#9776;</button>
+    <nav class="shop-nav" id="shopNav">
+      <a href="#" id="navHome">Home</a>
+      <a href="#" id="navShop">Shop</a>
+      <a href="#" id="navAbout">About</a>
+      <a href="#" id="navContact">Contact</a>
+    </nav>
+      <!-- Only one cart button and drawer, directly after header! -->
+  <button class="cart-fab" id="cartFab" aria-label="View cart">
+    🛒
+    <span class="cart-count">0</span>
+  </button>
+  </header>
+
+
+  <div class="cart-drawer" id="cartDrawer" tabindex="-1">
+    <button class="cart-close-btn" id="cartCloseBtn" aria-label="Close cart">&times;</button>
+    <h2>Your Cart</h2>
+    <div id="cartItems"></div>
+    <div class="cart-total" id="cartTotal"></div>
+    <button class="cart-checkout-btn" id="cartCheckoutBtn">Place Order</button>
+  </div>
+  
+  <section class="hero-trendings-section">
+    <div id="home" class="trendings-title">Trending Now!</div>
+    <div class="trendings-scroll">
+      <!-- Trending cards ... -->
+      <div class="trending-card">
+        <div style="position:relative;width:95%;height:90px;">
+          <img src="image1" alt="Trending 1" 
+            onerror="this.style.display='none';this.parentNode.querySelector('.img-placeholder').style.display='flex';">
+          <div class="img-placeholder" style="display:none;">Trend<br>1</div>
+        </div>
+        <div class="trending-card-title">Moon Cream Pie</div>
+        <div class="trending-card-price">$6.99</div>
+      </div>
+      <div class="trending-card">
+        <div style="position:relative;width:95%;height:90px;">
+          <img src="image2" alt="Trending 2"
+            onerror="this.style.display='none';this.parentNode.querySelector('.img-placeholder').style.display='flex';">
+          <div class="img-placeholder" style="display:none;">Trend<br>2</div>
+        </div>
+        <div class="trending-card-title">Chicken Wings Niger</div>
+        <div class="trending-card-price">$12.00</div>
+      </div>
+      <div class="trending-card">
+        <div style="position:relative;width:95%;height:90px;">
+          <img src="image3" alt="Trending 3"
+            onerror="this.style.display='none';this.parentNode.querySelector('.img-placeholder').style.display='flex';">
+          <div class="img-placeholder" style="display:none;">Trend<br>3</div>
+        </div>
+        <div class="trending-card-title">Niga Man</div>
+        <div class="trending-card-price">$3.50</div>
+      </div>
+
+            <div class="trending-card">
+        <div style="position:relative;width:95%;height:90px;">
+          <img src="image3" alt="Trending 3"
+            onerror="this.style.display='none';this.parentNode.querySelector('.img-placeholder').style.display='flex';">
+          <div class="img-placeholder" style="display:none;">Trend<br>4</div>
+        </div>
+        <div class="trending-card-title">Niga Man</div>
+        <div class="trending-card-price">$3.50</div>
+      </div>
+      <!-- Add more trending cards as needed -->
+    </div>
+  </section>
+
+  <div id="about" class="website-description">
+    <b>Retro Mart</b> is the official website marketplace by <b>Tenz</b> for our beloved players.<br><br>
+    Here, Niger players can safely buy, gain points, and discover unique in-game items, pets, and more to enhance their niger game.<br><br>
+    Shop with confidence, trade with friends, and help your garden flourish!
+  </div>
+
+  <div class="main-content">
+    <aside class="sidebar">
+      <div class="sidebar-title">Categories</div>
+      <button class="sidebar-btn active" data-category="all">All</button>
+      <button class="sidebar-btn" data-category="pins">Coins</button>
+      <button class="sidebar-btn" data-category="posters">Gpu</button>
+      <button class="sidebar-btn" data-category="stickers">Cpu</button>
+      <button class="sidebar-btn" data-category="magnets">Pepe</button>
+    </aside>
+    <section id="shop" class="products-area">
+      <div class="products-title">Featured Products</div>
+      <div class="product-grid" id="productGrid">
+        <!-- Product cards here ... -->
+        <div class="product-card" data-category="pins" data-id="pin1" data-title="Moon Cream Pin" data-price="6.99" data-img="image1">
+          <div class="product-img-box">
+            <img src="image1" alt="Moon Cream Pin" onerror="this.style.display='none';this.parentNode.querySelector('.img-placeholder').style.display='flex';">
+            <div class="img-placeholder" style="display:none;"><span>Moon Cream Pin</span></div>
+          </div>
+          <div class="product-main-title">Moon Cream Pin</div>
+          <div class="product-price">$6.99</div>
+          <button class="product-btn">Add to Cart</button>
+        </div>
+        <div class="product-card" data-category="posters" data-id="poster1" data-title="Retro Game Poster" data-price="12.00" data-img="image2">
+          <div class="product-img-box">
+            <img src="image2" alt="Retro Game Poster" onerror="this.style.display='none';this.parentNode.querySelector('.img-placeholder').style.display='flex';">
+            <div class="img-placeholder" style="display:none;"><span>Retro Game Poster</span></div>
+          </div>
+          <div class="product-main-title">Retro Game Poster</div>
+          <div class="product-price">$12.00</div>
+          <button class="product-btn">Add to Cart</button>
+        </div>
+        <div class="product-card" data-category="stickers" data-id="sticker1" data-title="Leaderboard Sticker" data-price="3.50" data-img="image3">
+          <div class="product-img-box">
+            <img src="image3" alt="Leaderboard Sticker" onerror="this.style.display='none';this.parentNode.querySelector('.img-placeholder').style.display='flex';">
+            <div class="img-placeholder" style="display:none;"><span>Leaderboard Sticker</span></div>
+          </div>
+          <div class="product-main-title">Leaderboard Sticker</div>
+          <div class="product-price">$3.50</div>
+          <button class="product-btn">Add to Cart</button>
+        </div>
+        <div class="product-card" data-category="magnets" data-id="magnet1" data-title="Game Night Magnet" data-price="4.99" data-img="image4">
+          <div class="product-img-box">
+            <img src="image4" alt="Game Night Magnet" onerror="this.style.display='none';this.parentNode.querySelector('.img-placeholder').style.display='flex';">
+            <div class="img-placeholder" style="display:none;"><span>Game Night Magnet</span></div>
+          </div>
+          <div class="product-main-title">Game Night Magnet</div>
+          <div class="product-price">$4.99</div>
+          <button class="product-btn">Add to Cart</button>
+        </div>
+        <!-- Add more product cards as needed -->
+      </div>
+    </section>
+  </div>
+
+  <footer class="shop-footer" id="contact">
+    <div class="footer-content">
+      <span>&copy; 2023 Retro Mart. All rights reserved.</span>
+      <div>
+        <span>Follow us:</span>
+        <a href="https://twitter.com/your_twitter" class="social-link" target="_blank" aria-label="Twitter">
+          <img src="Assets/contacts/x.svg" alt="Twitter" class="footer-icon">
+        </a>
+        <a href="https://instagram.com/your_instagram" class="social-link" target="_blank" aria-label="Instagram">
+          <img src="Assets/contacts/instagram.svg" alt="Instagram" class="footer-icon">
+        </a>
+        <a href="https://facebook.com/your_facebook" class="social-link" target="_blank" aria-label="Facebook">
+          <img src="Assets/contacts/facebook.svg" alt="Facebook" class="footer-icon">
+        </a>
+        <a href="https://discord.gg/your_discord" class="social-link" target="_blank" aria-label="Discord">
+          <img src="Assets/contacts/discord.svg" alt="Discord" class="footer-icon">
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Hamburger menu for mobile nav
+    const hamburgerBtn = document.getElementById('hamburgerBtn');
+    const shopNav = document.getElementById('shopNav');
+    hamburgerBtn.addEventListener('click', () => {
+      shopNav.classList.toggle('open');
+    });
+
+    // --- CATEGORY FILTER ---
+    const buttons = document.querySelectorAll('.sidebar-btn');
+    const cards = document.querySelectorAll('.product-card');
+    buttons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        buttons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const cat = btn.getAttribute('data-category');
+        cards.forEach(card => {
+          if(cat === 'all' || card.getAttribute('data-category') === cat) {
+            card.style.display = '';
+          } else {
+            card.style.display = 'none';
+          }
+        });
+      });
+    });
+
+    // --- ADD TO CART FUNCTIONALITY ---
+    let cart = {};
+    const cartFab = document.getElementById('cartFab');
+    const cartDrawer = document.getElementById('cartDrawer');
+    const cartCloseBtn = document.getElementById('cartCloseBtn');
+    const cartItemsDiv = document.getElementById('cartItems');
+    const cartTotalDiv = document.getElementById('cartTotal');
+    const cartCheckoutBtn = document.getElementById('cartCheckoutBtn');
+
+    function updateCartDisplay() {
+      let count = 0;
+      let total = 0;
+      cartItemsDiv.innerHTML = '';
+      Object.values(cart).forEach(item => {
+        count += item.qty;
+        total += item.qty * item.price;
+      });
+      // Update all cart-count elements (robust for future)
+      document.querySelectorAll('.cart-count').forEach(span => {
+        span.textContent = count;
+      });
+
+      if(count === 0) {
+        cartItemsDiv.innerHTML = '<div class="cart-empty">Your cart is empty!</div>';
+        cartTotalDiv.textContent = '';
+        cartCheckoutBtn.disabled = false;
+        return;
+      }
+      cartCheckoutBtn.disabled = false;
+      Object.values(cart).forEach(item => {
+        const el = document.createElement('div');
+        el.className = 'cart-item';
+        el.innerHTML = `
+          <div style="position:relative;width:48px;height:48px;">
+            <img class="cart-item-img" src="${item.img}" alt="${item.title}" onerror="this.style.display='none';this.parentNode.querySelector('.img-placeholder').style.display='flex';">
+          </div>
+          <div class="cart-item-title">${item.title}</div>
+          <div class="cart-item-price">$${(item.price*item.qty).toFixed(2)}</div>
+          <button class="cart-remove-btn" data-id="${item.id}">&times;</button>
+        `;
+        cartItemsDiv.appendChild(el);
+      });
+      cartTotalDiv.textContent = `Total: $${total.toFixed(2)}`;
+      // Remove functionality
+      Array.from(cartItemsDiv.querySelectorAll('.cart-remove-btn')).forEach(btn => {
+        btn.onclick = () => {
+          const id = btn.getAttribute('data-id');
+          delete cart[id];
+          updateCartDisplay();
+        };
+      });
+    }
+    // Add to cart button
+    document.querySelectorAll('.product-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const card = btn.closest('.product-card');
+        const id = card.getAttribute('data-id');
+        const title = card.getAttribute('data-title');
+        const price = parseFloat(card.getAttribute('data-price'));
+        const img = card.getAttribute('data-img');
+        if(cart[id]) cart[id].qty += 1;
+        else cart[id] = {id, title, price, img, qty: 1};
+        updateCartDisplay();
+      });
+    });
+
+    // Cart open/close
+    cartFab.onclick = () => {
+      cartDrawer.classList.add('open');
+    };
+    cartCloseBtn.onclick = () => {
+      cartDrawer.classList.remove('open');
+    };
+
+    // Remove original Place Order handling, will be replaced below
+    // cartCheckoutBtn.onclick = () => {
+    //   alert("Order placed! (This is a demo)");
+    //   cart = {};
+    //   updateCartDisplay();
+    //   cartDrawer.classList.remove('open');
+    // };
+    updateCartDisplay();
+  </script>
+
+  <script>
+    // --- SMOOTH NAVIGATION WITH CUSTOM ANIMATION ---
+    function slowScrollToElement(targetId, offset = 0, duration = 1000) {
+      const target = document.getElementById(targetId);
+      if (!target) return;
+      const headerOffset = document.querySelector('header').offsetHeight || 0;
+      const elementPosition = target.getBoundingClientRect().top + window.pageYOffset - headerOffset + offset;
+      const startPosition = window.pageYOffset;
+      const distance = elementPosition - startPosition;
+      let start = null;
+
+      function easeInOutQuad(t, b, c, d) {
+        t /= d/2;
+        if (t < 1) return c/2*t*t + b;
+        t--;
+        return -c/2 * (t*(t-2) - 1) + b;
+      }
+
+      function animateScroll(timestamp) {
+        if (!start) start = timestamp;
+        const elapsed = timestamp - start;
+        const run = easeInOutQuad(elapsed, startPosition, distance, duration);
+        window.scrollTo(0, run);
+        if (elapsed < duration) {
+          requestAnimationFrame(animateScroll);
+        } else {
+          window.scrollTo(0, elementPosition);
+        }
+      }
+
+      requestAnimationFrame(animateScroll);
+    }
+
+    document.getElementById('navHome').addEventListener('click', function(e) {
+      e.preventDefault();
+      slowScrollToElement('home', 0, 800);
+    });
+    document.getElementById('navShop').addEventListener('click', function(e) {
+      e.preventDefault();
+      slowScrollToElement('shop', 0, 800);
+    });
+    document.getElementById('navAbout').addEventListener('click', function(e) {
+      e.preventDefault();
+      slowScrollToElement('about', 0, 800);
+    });
+    document.getElementById('navContact').addEventListener('click', function(e) {
+      e.preventDefault();
+      slowScrollToElement('contact', 0, 800);
+    });
+  </script>
+
+  <!-- --- Cart Empty Animation and PayPal Redirect --- -->
+  <style>
+    .cart-drawer.cart-empty-anim {
+      animation: cartShake 0.42s cubic-bezier(.36,.07,.19,.97) both;
+      border-left: 3px solid #d18484 !important;
+      box-shadow: -8px 0 24px #e156796c, 0 0 0 4px #fff8e1 inset;
+    }
+    @keyframes cartShake {
+      10%, 90% { transform: translateX(-2px); }
+      20%, 80% { transform: translateX(4px); }
+      30%, 50%, 70% { transform: translateX(-8px); }
+      40%, 60% { transform: translateX(8px); }
+      100% { transform: translateX(0); }
+    }
+  </style>
+  <script>
+    function animateCartEmpty() {
+    const cartDrawer = document.getElementById('cartDrawer');
+    cartDrawer.classList.remove('cart-empty-anim'); // reset if already animating
+    void cartDrawer.offsetWidth; // force reflow
+    cartDrawer.classList.add('cart-empty-anim');
+    setTimeout(() => {
+        cartDrawer.classList.remove('cart-empty-anim');
+    }, 700); // Remove after 3 seconds
+    // Accessibility: focus cart drawer if possible
+    cartDrawer.focus && cartDrawer.focus();
+    }
+
+    const PAYPAL_REDIRECT_URL = "https://www.paypal.com"; // Replace with real PayPal checkout URL when ready
+
+    // Remove previous onclick and set new Place Order logic
+    const cartCheckoutBtn2 = document.getElementById('cartCheckoutBtn');
+    cartCheckoutBtn2.onclick = function() {
+      if (Object.keys(cart).length === 0) {
+        animateCartEmpty();
+        return;
+      }
+      // Redirect to PayPal
+      window.location.href = PAYPAL_REDIRECT_URL;
+    };
+  </script>
+</body>
+</html>
