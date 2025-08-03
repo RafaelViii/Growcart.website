@@ -10,39 +10,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
   <!-- PayPal JS SDK -->
   <script src="https://www.paypal.com/sdk/js?client-id=Ab958gA183gsQzVGClcGqW98tY6b1OIXXokzvMhsO1iXpTahhi1ETjmPopZkH82j0skdngxKbHTkLS_r&currency=USD"></script>
-  <style>
-    .roblox-profile-preview {
-      background: #232323;
-      margin-top: 12px;
-      border-radius: 7px;
-      padding: 16px 20px;
-      min-height: 70px;
-      display: flex;
-      align-items: center;
-      box-shadow: 0 2px 8px #0002;
-      font-size: 1.16em;
-      color: #fff;
-    }
-    .roblox-profile-preview img {
-      width: 56px;
-      height: 56px;
-      border-radius: 50%;
-      margin-right: 16px;
-      background: #111;
-      object-fit: cover;
-      border: 2px solid #d9ad57;
-    }
-    .roblox-profile-preview .username {
-      font-weight: 700;
-      color: #ffd700;
-      font-size: 1.18em;
-      margin-right: 8px;
-    }
-    .roblox-profile-preview .error {
-      color: #e15679;
-      font-weight: 500;
-    }
-  </style>
 </head>
 <body>
   <header class="shop-header">
@@ -74,7 +41,7 @@
       <input type="text" id="robloxUsername" required style="width:100%;font-size:1.15em;padding:10px;border-radius:6px;margin-bottom:0.5em;background:#222;color:#fff;border:2px solid #333;">
       <label style="font-size:.99em;display:block;margin-top:18px;margin-bottom:4px;">Email</label>
       <input type="email" id="userEmail" required style="width:100%;font-size:1.15em;padding:10px;border-radius:6px;margin-bottom:0.5em;background:#222;color:#fff;border:2px solid #333;">
-      <div id="robloxProfilePreview" class="roblox-profile-preview" style="margin-top:20px;"></div>
+      <!-- Roblox preview removed -->
     </form>
     <div id="paypal-button-container" style="margin:16px 0;"></div>
   </div>
@@ -280,7 +247,6 @@
     const cartTotalDiv = document.getElementById('cartTotal');
     // form fields
     const robloxInput = document.getElementById('robloxUsername');
-    const robloxProfilePreview = document.getElementById('robloxProfilePreview');
     const userEmail = document.getElementById('userEmail');
 
     function updateCartDisplay() {
@@ -338,36 +304,6 @@
     cartFab.onclick = () => { cartDrawer.classList.add('open'); };
     cartCloseBtn.onclick = () => { cartDrawer.classList.remove('open'); };
 
-    // --- Roblox Profile Preview ---
-    robloxInput.addEventListener('input', async function() {
-      const username = robloxInput.value.trim();
-      robloxProfilePreview.innerHTML = '';
-      if (!username) return;
-      robloxProfilePreview.innerHTML = '<span style="color:#bbb">Loading...</span>';
-      try {
-        // Use Netlify proxy for Roblox username lookup
-        const res = await fetch('https://688f241798a3e500087df8a0--tranquil-sprinkles-488bbb.netlify.app/.netlify/functions/roblox-lookup', {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ username })
-        });
-        const data = await res.json();
-        if (!data.data || !data.data[0]) throw 0;
-        const user = data.data[0];
-        const avatarRes = await fetch(`https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=${user.id}&size=100x100&format=Png&isCircular=true`);
-        const avatarData = await avatarRes.json();
-        const imgUrl = avatarData.data[0]?.imageUrl;
-        robloxProfilePreview.innerHTML = `
-          <a href="https://www.roblox.com/users/${user.id}/profile" target="_blank" title="View Roblox Profile" style="display:flex;align-items:center;text-decoration:none;">
-            <img src="${imgUrl}" alt="" />
-            <span class="username">${user.username}</span>
-          </a>
-        `;
-      } catch {
-        robloxProfilePreview.innerHTML = `<span class="error">User not found or banned.</span>`;
-      }
-    });
-
     // --- Firestore & Discord webhook ---
     async function firestoreOrder(order) {
       await addDoc(collection(db, "orders"), {
@@ -378,7 +314,7 @@
 
     async function sendDiscordWebhook(order) {
       // Replace with your own webhook
-      const webhookUrl = "YOUR_DISCORD_WEBHOOK_URL";
+      const webhookUrl = "https://discord.com/api/webhooks/1401496117451161683/-2Gwo7rWdNYPPIwQ6Tg5K-fmjU8xxl5uMfS9AMjW_GWLOfrRYRpe2mkWFZc6zZvZGbpr";
       await fetch(webhookUrl, {
         method: "POST",
         headers: {"Content-Type":"application/json"},
@@ -449,7 +385,6 @@
             updateCartDisplayWithPayPal();
             robloxInput.value = "";
             userEmail.value = "";
-            robloxProfilePreview.innerHTML = "";
           });
         }
       }).render('#paypal-button-container');

@@ -5,7 +5,6 @@
   <title>Admin Panel - Grow Cart</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    /* (Your CSS unchanged) */
     body {
       font-family: 'Segoe UI', Arial, sans-serif;
       background: #f7f6ff;
@@ -268,12 +267,30 @@
       <button class="btn" type="submit">Add Product</button>
     </form>
   </div>
+
+  <!-- Orders Section -->
+  <div class="section">
+    <h3 style="margin-top:32px;">Orders</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Roblox Username</th>
+          <th>Email</th>
+          <th>Items</th>
+          <th>Total ($)</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="ordersTableBody"></tbody>
+    </table>
+  </div>
 </div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
-import { getFirestore, collection, addDoc, doc, onSnapshot, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
-// No image upload needed
+import { getFirestore, collection, addDoc, doc, onSnapshot, deleteDoc, updateDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyC8ciuAyBxAEx29yeK756dhdrKI9ebD9gQ",
@@ -469,6 +486,61 @@ document.getElementById('addProdForm').onsubmit = async function(e) {
 
 // Initial assets dropdown
 renderAssetsOptions();
+
+// --- Orders ---
+let orders = [];
+const STATUS_LIST = ["pending", "done", "cancelled", "refund"];
+
+function renderOrders() {
+  const body = document.getElementById('ordersTableBody');
+  body.innerHTML = '';
+  orders.forEach(order => {
+    const itemsHtml = order.items && Array.isArray(order.items)
+      ? order.items.map(i => `<div>${i.title} x${i.qty}</div>`).join('')
+      : '';
+    const statusSel = `
+      <select data-id="${order.id}" class="order-status-sel">
+        ${STATUS_LIST.map(s => `<option value="${s}" ${s === order.status ? 'selected' : ''}>${s.charAt(0).toUpperCase() + s.slice(1)}</option>`).join('')}
+      </select>
+    `;
+    body.innerHTML += `
+      <tr>
+        <td data-label="Date">${order.created?.toDate ? order.created.toDate().toLocaleString() : ''}</td>
+        <td data-label="Roblox Username">${order.robloxUsername || ''}</td>
+        <td data-label="Email">${order.email || ''}</td>
+        <td data-label="Items">${itemsHtml}</td>
+        <td data-label="Total ($)">$${order.total}</td>
+        <td data-label="Status">${statusSel}</td>
+        <td data-label="Actions">
+          <button class="btn" onclick="window.deleteOrder('${order.id}')">Delete</button>
+        </td>
+      </tr>
+    `;
+  });
+
+  document.querySelectorAll('.order-status-sel').forEach(sel => {
+    sel.onchange = async function() {
+      const id = sel.getAttribute('data-id');
+      const newStatus = sel.value;
+      await updateDoc(doc(db, "orders", id), { status: newStatus });
+    };
+  });
+}
+
+// Listen to Firestore orders (latest first)
+onSnapshot(query(collection(db, "orders"), orderBy("created", "desc")), (snapshot) => {
+  orders = [];
+  snapshot.forEach(docSnap => {
+    orders.push({ id: docSnap.id, ...docSnap.data() });
+  });
+  renderOrders();
+});
+
+// Delete order
+window.deleteOrder = async function(id) {
+  if (!confirm("Delete this order?")) return;
+  await deleteDoc(doc(db, "orders", id));
+};
 </script>
 </body>
 </html>
