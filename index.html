@@ -58,7 +58,7 @@ robloxInput.addEventListener('input', async function() {
   robloxProfilePreview.innerHTML = '<span style="color:#bbb">Loading...</span>';
   try {
     // Use your local proxy!
-  const res = await fetch('https://688f241798a3e500087df8a0--tranquil-sprinkles-488bbb.netlify.app/.netlify/functions/roblox-lookup', {
+  const res = await fetch('https://688f241798a3e500087df8a0--tranquil-sprinkles-488bbb.netlify.app/netlify/functions/roblox-lookup', {
   method: "POST",
   headers: { "Content-Type": "application/json" },
   body: JSON.stringify({ username })
