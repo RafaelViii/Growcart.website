@@ -1,1 +1,1 @@
-# getnigaay update niga
+# getnigaay
