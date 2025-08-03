@@ -58,12 +58,12 @@ robloxInput.addEventListener('input', async function() {
   robloxProfilePreview.innerHTML = '<span style="color:#bbb">Loading...</span>';
   try {
     // Use your local proxy!
-    const res = await fetch('http://localhost:3001/api/roblox-lookup', {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username })
-    });
-    const data = await res.json();
+  const res = await fetch('https://688f241798a3e500087df8a0--tranquil-sprinkles-488bbb.netlify.app/.netlify/functions/roblox-lookup', {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ username })
+});
+const data = await res.json();
     if (!data.data || !data.data[0]) throw 0;
     const user = data.data[0];
     const avatarRes = await fetch(`https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=${user.id}&size=100x100&format=Png`);
