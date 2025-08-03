@@ -5,6 +5,7 @@
   <title>Admin Panel - Grow Cart</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
+    /* (Your CSS unchanged) */
     body {
       font-family: 'Segoe UI', Arial, sans-serif;
       background: #f7f6ff;
@@ -118,7 +119,6 @@
       width: 100%;
     }
 
-    /* --- Responsive --- */
     @media (max-width: 860px) {
       .admin-container {
         margin: 10px;
@@ -260,6 +260,7 @@
       <input type="text" id="addProdName" placeholder="Product name" required>
       <input type="number" id="addProdPrice" placeholder="Price" min="0" step="0.01" required>
       <input type="number" id="addProdStock" placeholder="Stock" min="0" step="1" required>
+      <!-- Image dropdown -->
       <select id="addProdImg" required>
         <option value="" disabled selected>Image</option>
       </select>
@@ -269,7 +270,24 @@
   </div>
 </div>
 
-<script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+import { getFirestore, collection, addDoc, doc, onSnapshot, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+// No image upload needed
+
+const firebaseConfig = {
+  apiKey: "AIzaSyC8ciuAyBxAEx29yeK756dhdrKI9ebD9gQ",
+  authDomain: "growcart-19ffd.firebaseapp.com",
+  projectId: "growcart-19ffd",
+  storageBucket: "growcart-19ffd.appspot.com",
+  messagingSenderId: "373536744308",
+  appId: "1:373536744308:web:5e43d8462dcd7f28e08221",
+  measurementId: "G-Q4JDQ62CMF"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
 const ASSETS_PATH = "Assets/contacts/";
 const AVAILABLE_IMAGES = [
   "mooncream.jpg",
@@ -283,18 +301,17 @@ const AVAILABLE_IMAGES = [
   "facebook.svg"
 ];
 
-let categories = [
-  {id: "cat1", name: "Coins"},
-  {id: "cat2", name: "Cpu"},
-  {id: "cat3", name: "Gpu"}
-];
+// Populate product image dropdown
+function renderAssetsOptions() {
+  const select = document.getElementById('addProdImg');
+  select.innerHTML = '<option value="" disabled selected>Image</option>';
+  AVAILABLE_IMAGES.forEach(img => {
+    select.innerHTML += `<option value="${img}">${img}</option>`;
+  });
+}
 
-let products = [
-  {id: "prod1", name: "Moon Cream Pie", price: 6.99, categoryId: "cat1", stock: 10, image: "facebook.svg", isTrending: true},
-  {id: "prod2", name: "Chicken Wings Niger", price: 12.00, categoryId: "cat2", stock: 7, image: "x.svg", isTrending: false},
-  {id: "prod3", name: "Leaderboard Sticker", price: 3.50, categoryId: "cat3", stock: 100, image: "discord.svg", isTrending: true}
-];
-
+// --- Categories ---
+let categories = [];
 function renderCategories() {
   const body = document.getElementById('catTableBody');
   body.innerHTML = '';
@@ -305,48 +322,55 @@ function renderCategories() {
         <input type="text" value="${cat.name}" data-id="${cat.id}" style="width:83%;" class="cat-edit-inp">
       </td>
       <td data-label="Actions">
-        <button class="btn" onclick="updateCategory('${cat.id}')">Save</button>
-        <button class="btn" onclick="deleteCategory('${cat.id}')" ${products.some(p=>p.categoryId===cat.id)?'disabled':''}>Delete</button>
+        <button class="btn" onclick="window.updateCategory('${cat.id}')">Save</button>
+        <button class="btn" onclick="window.deleteCategory('${cat.id}')" ${products.some(p=>p.category===cat.id)?'disabled':''}>Delete</button>
       </td>
     `;
     body.appendChild(tr);
   });
+
   const select = document.getElementById('addProdCat');
   select.innerHTML = '<option value="" disabled selected>Category</option>';
   categories.forEach(cat => {
     select.innerHTML += `<option value="${cat.id}">${cat.name}</option>`;
   });
 }
-window.updateCategory = function(catId) {
-  const inp = document.querySelector(`input.cat-edit-inp[data-id="${catId}"]`);
-  const cat = categories.find(c=>c.id===catId);
-  if (inp && cat && inp.value.trim()) {
-    cat.name = inp.value.trim();
-    renderCategories();
-    renderProducts();
-  }
-};
-window.deleteCategory = function(catId) {
-  if (!confirm("Delete this category?")) return;
-  categories = categories.filter(c=>c.id!==catId);
+
+// Listen to Firestore categories
+onSnapshot(collection(db, "categories"), (snapshot) => {
+  categories = [];
+  snapshot.forEach(docSnap => {
+    categories.push({ id: docSnap.id, ...docSnap.data() });
+  });
   renderCategories();
   renderProducts();
+});
+
+window.updateCategory = async function(catId) {
+  const inp = document.querySelector(`input.cat-edit-inp[data-id="${catId}"]`);
+  if (inp && inp.value.trim()) {
+    await updateDoc(doc(db, "categories", catId), { name: inp.value.trim() });
+  }
 };
-document.getElementById('addCatForm').onsubmit = function(e) {
+window.deleteCategory = async function(catId) {
+  if (!confirm("Delete this category?")) return;
+  await deleteDoc(doc(db, "categories", catId));
+};
+document.getElementById('addCatForm').onsubmit = async function(e) {
   e.preventDefault();
   const val = document.getElementById('newCatName').value.trim();
   if (!val) return;
-  const newId = "cat" + Date.now();
-  categories.push({id: newId, name: val});
+  await addDoc(collection(db, "categories"), { name: val });
   document.getElementById('newCatName').value = '';
-  renderCategories();
 };
 
+// --- Products ---
+let products = [];
 function renderProducts() {
   const body = document.getElementById('prodTableBody');
   body.innerHTML = '';
   products.forEach((prod, idx) => {
-    const cat = categories.find(c=>c.id===prod.categoryId);
+    const cat = categories.find(c=>c.id===prod.category);
     const tr = document.createElement('tr');
     tr.innerHTML = `
       <td data-label="Preview"><img class="img-preview" src="${ASSETS_PATH + prod.image}" alt="" onerror="this.src='${ASSETS_PATH}placeholder.jpg'"></td>
@@ -358,24 +382,23 @@ function renderProducts() {
       </td>
       <td data-label="Category">
         <select id="prodcat_${prod.id}">
-          ${categories.map(c=>`<option value="${c.id}" ${c.id===prod.categoryId?'selected':''}>${c.name}</option>`).join('')}
+          ${categories.map(c=>`<option value="${c.id}" ${c.id===prod.category?'selected':''}>${c.name}</option>`).join('')}
         </select>
       </td>
       <td data-label="Stock">
         <input type="number" min="0" step="1" value="${prod.stock||0}" id="prodstk_${prod.id}" style="width:60px;">
       </td>
       <td data-label="Trending">
-        <span class="trending-toggle" onclick="toggleTrending('${prod.id}')">${prod.isTrending?'⭐️':'☆'}</span>
+        <span class="trending-toggle" onclick="window.toggleTrending('${prod.id}')">${prod.trending?'⭐️':'☆'}</span>
       </td>
       <td data-label="Actions">
         <div class="product-actions">
-          <button class="btn save" onclick="saveProduct('${prod.id}')">Save</button>
-          <button class="btn" onclick="deleteProduct('${prod.id}')">Delete</button>
+          <button class="btn save" onclick="window.saveProduct('${prod.id}')">Save</button>
+          <button class="btn" onclick="window.deleteProduct('${prod.id}')">Delete</button>
         </div>
       </td>
     `;
     body.appendChild(tr);
-
     // Add separator after each product row except the last one
     if (idx < products.length - 1) {
       const sepRow = document.createElement('tr');
@@ -384,60 +407,68 @@ function renderProducts() {
     }
   });
 }
-window.saveProduct = function(id) {
+
+// Listen to Firestore products
+onSnapshot(collection(db, "products"), (snapshot) => {
+  products = [];
+  snapshot.forEach(docSnap => {
+    products.push({ id: docSnap.id, ...docSnap.data() });
+  });
+  renderProducts();
+  renderCategories(); // To update Delete buttons for category usage
+});
+
+window.saveProduct = async function(id) {
   const prod = products.find(p=>p.id===id);
   if (!prod) return;
-  prod.name = document.getElementById(`prodname_${id}`).value.trim();
-  prod.price = parseFloat(document.getElementById(`prodprice_${id}`).value) || 0;
-  prod.categoryId = document.getElementById(`prodcat_${id}`).value;
-  prod.stock = parseInt(document.getElementById(`prodstk_${id}`).value) || 0;
-  renderProducts();
+  const name = document.getElementById(`prodname_${id}`).value.trim();
+  const price = parseFloat(document.getElementById(`prodprice_${id}`).value) || 0;
+  const category = document.getElementById(`prodcat_${id}`).value;
+  const stock = parseInt(document.getElementById(`prodstk_${id}`).value) || 0;
+  await updateDoc(doc(db, "products", id), {
+    name, price, category, stock
+  });
 };
-window.deleteProduct = function(id) {
+
+window.deleteProduct = async function(id) {
   if (!confirm("Delete this product?")) return;
-  products = products.filter(p=>p.id!==id);
-  renderProducts();
+  await deleteDoc(doc(db, "products", id));
 };
-window.toggleTrending = function(id) {
+
+window.toggleTrending = async function(id) {
   const prod = products.find(p=>p.id===id);
   if (prod) {
-    prod.isTrending = !prod.isTrending;
-    renderProducts();
+    await updateDoc(doc(db, "products", id), { trending: !prod.trending });
   }
 };
 
-function renderAssetsOptions() {
-  const select = document.getElementById('addProdImg');
-  select.innerHTML = '<option value="" disabled selected>Image</option>';
-  AVAILABLE_IMAGES.forEach(img => {
-    select.innerHTML += `<option value="${img}">${img}</option>`;
-  });
-}
-document.getElementById('addProdForm').onsubmit = function(e) {
+// Add Product form
+document.getElementById('addProdForm').onsubmit = async function(e) {
   e.preventDefault();
-  const catId = document.getElementById('addProdCat').value;
+  const category = document.getElementById('addProdCat').value;
   const name = document.getElementById('addProdName').value.trim();
   const price = parseFloat(document.getElementById('addProdPrice').value);
   const stock = parseInt(document.getElementById('addProdStock').value) || 0;
+  const trending = document.getElementById('addProdTrend').checked;
   const img = document.getElementById('addProdImg').value;
-  const trend = document.getElementById('addProdTrend').checked;
-  if (!catId || !name || isNaN(price) || !img) return;
-  const newId = "prod" + Date.now();
-  products.push({id: newId, name, price, categoryId: catId, stock, image: img, isTrending: trend});
+
+  if (!name || isNaN(price) || !category || isNaN(stock) || !img)
+    return alert("Fill all fields and select image");
+
+  await addDoc(collection(db, "products"), {
+    name, price, category, stock, trending, image: img
+  });
+
   document.getElementById('addProdName').value = '';
   document.getElementById('addProdPrice').value = '';
   document.getElementById('addProdStock').value = '';
   document.getElementById('addProdImg').selectedIndex = 0;
   document.getElementById('addProdCat').selectedIndex = 0;
   document.getElementById('addProdTrend').checked = false;
-  renderProducts();
 };
 
-renderCategories();
-renderProducts();
+// Initial assets dropdown
 renderAssetsOptions();
 </script>
-
-
 </body>
 </html>

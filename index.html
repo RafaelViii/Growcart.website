@@ -3,28 +3,91 @@
 <head>
   <meta charset="UTF-8">
   <title>Grow Shop</title>
-  <!-- updated codess -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="style.css"> 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <!-- PayPal JS SDK -->
+  <script src="https://www.paypal.com/sdk/js?client-id=Ab958gA183gsQzVGClcGqW98tY6b1OIXXokzvMhsO1iXpTahhi1ETjmPopZkH82j0skdngxKbHTkLS_r&currency=USD"></script>
+  <style>
+    .roblox-profile-preview {
+      background: #232323;
+      margin-top: 12px;
+      border-radius: 7px;
+      padding: 16px 20px;
+      min-height: 70px;
+      display: flex;
+      align-items: center;
+      box-shadow: 0 2px 8px #0002;
+      font-size: 1.16em;
+      color: #fff;
+    }
+    .roblox-profile-preview img {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      margin-right: 16px;
+      background: #111;
+      object-fit: cover;
+      border: 2px solid #d9ad57;
+    }
+    .roblox-profile-preview .username {
+      font-weight: 700;
+      color: #ffd700;
+      font-size: 1.18em;
+      margin-right: 8px;
+    }
+    .roblox-profile-preview .error {
+      color: #e15679;
+      font-weight: 500;
+    }
+  </style>
+
+  <script type="module">
+// ...your Firebase and other code...
+
+// Roblox Profile Preview using your proxy!
+const robloxInput = document.getElementById('robloxUsername');
+const robloxProfilePreview = document.getElementById('robloxProfilePreview');
+
+robloxInput.addEventListener('input', async function() {
+  const username = robloxInput.value.trim();
+  robloxProfilePreview.innerHTML = '';
+  if (!username) return;
+  robloxProfilePreview.innerHTML = '<span style="color:#bbb">Loading...</span>';
+  try {
+    // Use your local proxy!
+    const res = await fetch('http://localhost:3001/api/roblox-lookup', {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username })
+    });
+    const data = await res.json();
+    if (!data.data || !data.data[0]) throw 0;
+    const user = data.data[0];
+    const avatarRes = await fetch(`https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=${user.id}&size=100x100&format=Png`);
+    const avatarData = await avatarRes.json();
+    const imgUrl = avatarData.data[0]?.imageUrl;
+    robloxProfilePreview.innerHTML = `
+      <a href="https://www.roblox.com/users/${user.id}/profile" target="_blank" title="View Roblox Profile" style="display:flex;align-items:center;text-decoration:none;">
+        <img src="${imgUrl}" alt="" />
+        <span class="username">${user.username}</span>
+      </a>
+    `;
+  } catch {
+    robloxProfilePreview.innerHTML = `<span class="error">User not found or banned.</span>`;
+  }
+});
+// ...rest of your JS code...
+</script>
 </head>
 <body>
-  <!-- Cloud background -->
-  <div class="cloud-bg" aria-hidden="true">
-    <svg class="cloud1" viewBox="0 0 100 40"><ellipse cx="50" cy="20" rx="48" ry="18" fill="#fff" opacity="0.45"/></svg>
-    <svg class="cloud2" viewBox="0 0 100 40"><ellipse cx="50" cy="20" rx="39" ry="13" fill="#fff" opacity="0.26"/></svg>
-    <svg class="cloud3" viewBox="0 0 100 40"><ellipse cx="50" cy="20" rx="30" ry="12" fill="#fff" opacity="0.22"/></svg>
-    <svg class="cloud4" viewBox="0 0 100 40"><ellipse cx="50" cy="20" rx="33" ry="10" fill="#fff" opacity="0.13"/></svg>
-    <svg class="cloud5" viewBox="0 0 100 40"><ellipse cx="50" cy="20" rx="28" ry="9" fill="#fff" opacity="0.11"/></svg>
-  </div>
   <header class="shop-header">
     <span class="brand">
       <img src="your-logo.png" class="brand-logo" alt="Grow Shop Logo">
       GROW CART
     </span>
-    
     <button class="hamburger" aria-label="Menu" id="hamburgerBtn">&#9776;</button>
     <nav class="shop-nav" id="shopNav">
       <a href="#" id="navHome">Home</a>
@@ -32,65 +95,31 @@
       <a href="#" id="navAbout">About</a>
       <a href="#" id="navContact">Contact</a>
     </nav>
-      <!-- Only one cart button and drawer, directly after header! -->
-  <button class="cart-fab" id="cartFab" aria-label="View cart">
-    🛒
-    <span class="cart-count">0</span>
-  </button>
+    <button class="cart-fab" id="cartFab" aria-label="View cart">
+      🛒
+      <span class="cart-count">0</span>
+    </button>
   </header>
-
 
   <div class="cart-drawer" id="cartDrawer" tabindex="-1">
     <button class="cart-close-btn" id="cartCloseBtn" aria-label="Close cart">&times;</button>
     <h2>Your Cart</h2>
     <div id="cartItems"></div>
     <div class="cart-total" id="cartTotal"></div>
-    <button class="cart-checkout-btn" id="cartCheckoutBtn">Place Order</button>
+
+    <form id="userInfoForm" autocomplete="off" style="margin:1em 0;">
+      <label style="font-size:.99em;display:block;margin-bottom:4px;">Roblox Username</label>
+      <input type="text" id="robloxUsername" required style="width:100%;font-size:1.15em;padding:10px;border-radius:6px;margin-bottom:0.5em;background:#222;color:#fff;border:2px solid #333;">
+      <label style="font-size:.99em;display:block;margin-top:18px;margin-bottom:4px;">Email</label>
+      <input type="email" id="userEmail" required style="width:100%;font-size:1.15em;padding:10px;border-radius:6px;margin-bottom:0.5em;background:#222;color:#fff;border:2px solid #333;">
+      <div id="robloxProfilePreview" class="roblox-profile-preview" style="margin-top:20px;"></div>
+    </form>
+    <div id="paypal-button-container" style="margin:16px 0;"></div>
   </div>
   
   <section class="hero-trendings-section">
     <div id="home" class="trendings-title">Trending Now!</div>
-    <div class="trendings-scroll">
-      <!-- Trending cards ... -->
-      <div class="trending-card">
-        <div style="position:relative;width:95%;height:90px;">
-          <img src="image1" alt="Trending 1" 
-            onerror="this.style.display='none';this.parentNode.querySelector('.img-placeholder').style.display='flex';">
-          <div class="img-placeholder" style="display:none;">Trend<br>1</div>
-        </div>
-        <div class="trending-card-title">Moon Cream Pie</div>
-        <div class="trending-card-price">$6.99</div>
-      </div>
-      <div class="trending-card">
-        <div style="position:relative;width:95%;height:90px;">
-          <img src="image2" alt="Trending 2"
-            onerror="this.style.display='none';this.parentNode.querySelector('.img-placeholder').style.display='flex';">
-          <div class="img-placeholder" style="display:none;">Trend<br>2</div>
-        </div>
-        <div class="trending-card-title">Chicken Wings Niger</div>
-        <div class="trending-card-price">$12.00</div>
-      </div>
-      <div class="trending-card">
-        <div style="position:relative;width:95%;height:90px;">
-          <img src="image3" alt="Trending 3"
-            onerror="this.style.display='none';this.parentNode.querySelector('.img-placeholder').style.display='flex';">
-          <div class="img-placeholder" style="display:none;">Trend<br>3</div>
-        </div>
-        <div class="trending-card-title">Niga Man</div>
-        <div class="trending-card-price">$3.50</div>
-      </div>
-
-            <div class="trending-card">
-        <div style="position:relative;width:95%;height:90px;">
-          <img src="image3" alt="Trending 3"
-            onerror="this.style.display='none';this.parentNode.querySelector('.img-placeholder').style.display='flex';">
-          <div class="img-placeholder" style="display:none;">Trend<br>4</div>
-        </div>
-        <div class="trending-card-title">Niga Man</div>
-        <div class="trending-card-price">$3.50</div>
-      </div>
-      <!-- Add more trending cards as needed -->
-    </div>
+    <div class="trendings-scroll" id="trendingsScroll"></div>
   </section>
 
   <div id="about" class="website-description">
@@ -100,55 +129,14 @@
   </div>
 
   <div class="main-content">
-    <aside class="sidebar">
+    <aside class="sidebar" id="sidebar">
       <div class="sidebar-title">Categories</div>
-      <button class="sidebar-btn active" data-category="all">All</button>
-      <button class="sidebar-btn" data-category="pins">Coins</button>
-      <button class="sidebar-btn" data-category="posters">Gpu</button>
-      <button class="sidebar-btn" data-category="stickers">Cpu</button>
-      <button class="sidebar-btn" data-category="magnets">Pepe</button>
+      <!-- Category buttons dynamically added by JS -->
     </aside>
     <section id="shop" class="products-area">
       <div class="products-title">Featured Products</div>
       <div class="product-grid" id="productGrid">
-        <!-- Product cards here ... -->
-        <div class="product-card" data-category="pins" data-id="pin1" data-title="Moon Cream Pin" data-price="6.99" data-img="image1">
-          <div class="product-img-box">
-            <img src="image1" alt="Moon Cream Pin" onerror="this.style.display='none';this.parentNode.querySelector('.img-placeholder').style.display='flex';">
-            <div class="img-placeholder" style="display:none;"><span>Moon Cream Pin</span></div>
-          </div>
-          <div class="product-main-title">Moon Cream Pin</div>
-          <div class="product-price">$6.99</div>
-          <button class="product-btn">Add to Cart</button>
-        </div>
-        <div class="product-card" data-category="posters" data-id="poster1" data-title="Retro Game Poster" data-price="12.00" data-img="image2">
-          <div class="product-img-box">
-            <img src="image2" alt="Retro Game Poster" onerror="this.style.display='none';this.parentNode.querySelector('.img-placeholder').style.display='flex';">
-            <div class="img-placeholder" style="display:none;"><span>Retro Game Poster</span></div>
-          </div>
-          <div class="product-main-title">Retro Game Poster</div>
-          <div class="product-price">$12.00</div>
-          <button class="product-btn">Add to Cart</button>
-        </div>
-        <div class="product-card" data-category="stickers" data-id="sticker1" data-title="Leaderboard Sticker" data-price="3.50" data-img="image3">
-          <div class="product-img-box">
-            <img src="image3" alt="Leaderboard Sticker" onerror="this.style.display='none';this.parentNode.querySelector('.img-placeholder').style.display='flex';">
-            <div class="img-placeholder" style="display:none;"><span>Leaderboard Sticker</span></div>
-          </div>
-          <div class="product-main-title">Leaderboard Sticker</div>
-          <div class="product-price">$3.50</div>
-          <button class="product-btn">Add to Cart</button>
-        </div>
-        <div class="product-card" data-category="magnets" data-id="magnet1" data-title="Game Night Magnet" data-price="4.99" data-img="image4">
-          <div class="product-img-box">
-            <img src="image4" alt="Game Night Magnet" onerror="this.style.display='none';this.parentNode.querySelector('.img-placeholder').style.display='flex';">
-            <div class="img-placeholder" style="display:none;"><span>Game Night Magnet</span></div>
-          </div>
-          <div class="product-main-title">Game Night Magnet</div>
-          <div class="product-price">$4.99</div>
-          <button class="product-btn">Add to Cart</button>
-        </div>
-        <!-- Add more product cards as needed -->
+        <!-- Product cards dynamically added by JS -->
       </div>
     </section>
   </div>
@@ -174,40 +162,164 @@
     </div>
   </footer>
 
-  <script>
-    // Hamburger menu for mobile nav
-    const hamburgerBtn = document.getElementById('hamburgerBtn');
-    const shopNav = document.getElementById('shopNav');
-    hamburgerBtn.addEventListener('click', () => {
-      shopNav.classList.toggle('open');
-    });
+  <!-- Firebase Firestore integration as ES Modules -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+    import { getFirestore, collection, onSnapshot, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
-    // --- CATEGORY FILTER ---
-    const buttons = document.querySelectorAll('.sidebar-btn');
-    const cards = document.querySelectorAll('.product-card');
-    buttons.forEach(btn => {
-      btn.addEventListener('click', () => {
-        buttons.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        const cat = btn.getAttribute('data-category');
-        cards.forEach(card => {
-          if(cat === 'all' || card.getAttribute('data-category') === cat) {
-            card.style.display = '';
-          } else {
-            card.style.display = 'none';
-          }
+    const firebaseConfig = {
+      apiKey: "AIzaSyC8ciuAyBxAEx29yeK756dhdrKI9ebD9gQ",
+      authDomain: "growcart-19ffd.firebaseapp.com",
+      projectId: "growcart-19ffd",
+      storageBucket: "growcart-19ffd.appspot.com",
+      messagingSenderId: "373536744308",
+      appId: "1:373536744308:web:5e43d8462dcd7f28e08221",
+      measurementId: "G-Q4JDQ62CMF"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const ASSETS_PATH = "Assets/contacts/";
+    let categories = [];
+    let products = [];
+
+    // --- Load categories and products from Firestore ---
+    function renderCategoriesSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      sidebar.innerHTML = '<div class="sidebar-title">Categories</div>';
+      // "All" button
+      const allBtn = document.createElement('button');
+      allBtn.className = 'sidebar-btn active';
+      allBtn.dataset.category = 'all';
+      allBtn.textContent = 'All';
+      sidebar.appendChild(allBtn);
+
+      allBtn.onclick = () => {
+        document.querySelectorAll('.sidebar-btn').forEach(b => b.classList.remove('active'));
+        allBtn.classList.add('active');
+        renderProductsGrid('all');
+      };
+
+      categories.forEach(cat => {
+        const btn = document.createElement('button');
+        btn.className = 'sidebar-btn';
+        btn.dataset.category = cat.id;
+        btn.textContent = cat.name;
+        btn.onclick = () => {
+          document.querySelectorAll('.sidebar-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          renderProductsGrid(cat.id);
+        };
+        sidebar.appendChild(btn);
+      });
+    }
+
+    function renderProductsGrid(filterCat = 'all') {
+      const grid = document.getElementById('productGrid');
+      grid.innerHTML = '';
+      products.forEach(prod => {
+        if (filterCat !== 'all' && prod.category !== filterCat) return;
+        const card = document.createElement('div');
+        card.className = 'product-card';
+        card.dataset.category = prod.category;
+        card.dataset.id = prod.id;
+        card.dataset.title = prod.name;
+        card.dataset.price = prod.price;
+        card.dataset.img = ASSETS_PATH + prod.image;
+
+        card.innerHTML = `
+          <div class="product-img-box">
+            <img src="${ASSETS_PATH + prod.image}" alt="${prod.name}" class="product-img">
+            <div class="img-placeholder" style="display:none;"><span>${prod.name}</span></div>
+          </div>
+          <div class="product-main-title">${prod.name}</div>
+          <div class="product-price">$${prod.price}</div>
+          <button class="product-btn">Add to Cart</button>
+        `;
+        grid.appendChild(card);
+      });
+
+      // Add robust image onerror handler after rendering
+      document.querySelectorAll('.product-img').forEach(img => {
+        img.onerror = function() {
+          this.style.display = 'none';
+          var p = this.parentNode.querySelector('.img-placeholder');
+          if (p) p.style.display = 'flex';
+        };
+      });
+
+      // Re-attach listeners
+      document.querySelectorAll('.product-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+          const card = btn.closest('.product-card');
+          const id = card.getAttribute('data-id');
+          const title = card.getAttribute('data-title');
+          const price = parseFloat(card.getAttribute('data-price'));
+          const img = card.getAttribute('data-img');
+          if(cart[id]) cart[id].qty += 1;
+          else cart[id] = {id, title, price, img, qty: 1};
+          updateCartDisplayWithPayPal();
         });
       });
+    }
+
+    function renderTrendingProducts() {
+      const trendingsScroll = document.getElementById('trendingsScroll');
+      trendingsScroll.innerHTML = '';
+      products.filter(p => p.trending).forEach((prod, idx) => {
+        const card = document.createElement('div');
+        card.className = 'trending-card';
+        card.innerHTML = `
+          <div style="position:relative;width:95%;height:90px;">
+            <img src="${ASSETS_PATH + prod.image}" alt="Trending ${idx+1}" class="product-img">
+            <div class="img-placeholder" style="display:none;">Trend<br>${idx+1}</div>
+          </div>
+          <div class="trending-card-title">${prod.name}</div>
+          <div class="trending-card-price">$${prod.price}</div>
+        `;
+        trendingsScroll.appendChild(card);
+      });
+
+      document.querySelectorAll('.product-img').forEach(img => {
+        img.onerror = function() {
+          this.style.display = 'none';
+          var p = this.parentNode.querySelector('.img-placeholder');
+          if (p) p.style.display = 'flex';
+        };
+      });
+    }
+
+    // Firestore live sync
+    onSnapshot(collection(db, "categories"), snapshot => {
+      categories = [];
+      snapshot.forEach(docSnap => {
+        categories.push({ id: docSnap.id, ...docSnap.data() });
+      });
+      renderCategoriesSidebar();
+      renderProductsGrid(document.querySelector('.sidebar-btn.active')?.dataset.category || 'all');
     });
 
-    // --- ADD TO CART FUNCTIONALITY ---
+    onSnapshot(collection(db, "products"), snapshot => {
+      products = [];
+      snapshot.forEach(docSnap => {
+        products.push({ id: docSnap.id, ...docSnap.data() });
+      });
+      renderProductsGrid(document.querySelector('.sidebar-btn.active')?.dataset.category || 'all');
+      renderTrendingProducts();
+    });
+
+    // --- Cart code ---
     let cart = {};
     const cartFab = document.getElementById('cartFab');
     const cartDrawer = document.getElementById('cartDrawer');
     const cartCloseBtn = document.getElementById('cartCloseBtn');
     const cartItemsDiv = document.getElementById('cartItems');
     const cartTotalDiv = document.getElementById('cartTotal');
-    const cartCheckoutBtn = document.getElementById('cartCheckoutBtn');
+    // form fields
+    const robloxInput = document.getElementById('robloxUsername');
+    const robloxProfilePreview = document.getElementById('robloxProfilePreview');
+    const userEmail = document.getElementById('userEmail');
 
     function updateCartDisplay() {
       let count = 0;
@@ -217,7 +329,6 @@
         count += item.qty;
         total += item.qty * item.price;
       });
-      // Update all cart-count elements (robust for future)
       document.querySelectorAll('.cart-count').forEach(span => {
         span.textContent = count;
       });
@@ -225,16 +336,16 @@
       if(count === 0) {
         cartItemsDiv.innerHTML = '<div class="cart-empty">Your cart is empty!</div>';
         cartTotalDiv.textContent = '';
-        cartCheckoutBtn.disabled = false;
+        renderPayPalButton(); // Ensure PayPal button is cleared when cart is empty
         return;
       }
-      cartCheckoutBtn.disabled = false;
       Object.values(cart).forEach(item => {
         const el = document.createElement('div');
         el.className = 'cart-item';
         el.innerHTML = `
           <div style="position:relative;width:48px;height:48px;">
-            <img class="cart-item-img" src="${item.img}" alt="${item.title}" onerror="this.style.display='none';this.parentNode.querySelector('.img-placeholder').style.display='flex';">
+            <img class="cart-item-img" src="${item.img}" alt="${item.title}">
+            <div class="img-placeholder" style="display:none;"><span>${item.title}</span></div>
           </div>
           <div class="cart-item-title">${item.title}</div>
           <div class="cart-item-price">$${(item.price*item.qty).toFixed(2)}</div>
@@ -242,49 +353,152 @@
         `;
         cartItemsDiv.appendChild(el);
       });
+
+      // Robust image error handler
+      document.querySelectorAll('.cart-item-img').forEach(img => {
+        img.onerror = function() {
+          this.style.display = 'none';
+          var p = this.parentNode.querySelector('.img-placeholder');
+          if (p) p.style.display = 'flex';
+        };
+      });
+
       cartTotalDiv.textContent = `Total: $${total.toFixed(2)}`;
-      // Remove functionality
       Array.from(cartItemsDiv.querySelectorAll('.cart-remove-btn')).forEach(btn => {
         btn.onclick = () => {
           const id = btn.getAttribute('data-id');
           delete cart[id];
-          updateCartDisplay();
+          updateCartDisplayWithPayPal();
         };
       });
     }
-    // Add to cart button
-    document.querySelectorAll('.product-btn').forEach(btn => {
-      btn.addEventListener('click', function() {
-        const card = btn.closest('.product-card');
-        const id = card.getAttribute('data-id');
-        const title = card.getAttribute('data-title');
-        const price = parseFloat(card.getAttribute('data-price'));
-        const img = card.getAttribute('data-img');
-        if(cart[id]) cart[id].qty += 1;
-        else cart[id] = {id, title, price, img, qty: 1};
-        updateCartDisplay();
-      });
+
+    cartFab.onclick = () => { cartDrawer.classList.add('open'); };
+    cartCloseBtn.onclick = () => { cartDrawer.classList.remove('open'); };
+
+    // --- Roblox Profile Preview ---
+    robloxInput.addEventListener('input', async function() {
+      const username = robloxInput.value.trim();
+      robloxProfilePreview.innerHTML = '';
+      if (!username) return;
+      robloxProfilePreview.innerHTML = '<span style="color:#bbb">Loading...</span>';
+      try {
+        // Get Roblox userId and info
+        const res = await fetch(`https://users.roblox.com/v1/usernames/users`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ usernames: [username], excludeBannedUsers: true })
+        });
+        const data = await res.json();
+        if (!data.data || !data.data[0]) throw 0;
+        const user = data.data[0];
+        const avatarRes = await fetch(`https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=${user.id}&size=100x100&format=Png`);
+        const avatarData = await avatarRes.json();
+        const imgUrl = avatarData.data[0]?.imageUrl;
+        robloxProfilePreview.innerHTML = `
+          <a href="https://www.roblox.com/users/${user.id}/profile" target="_blank" title="View Roblox Profile" style="display:flex;align-items:center;text-decoration:none;">
+            <img src="${imgUrl}" alt="" />
+            <span class="username">${user.username}</span>
+          </a>
+        `;
+      } catch {
+        robloxProfilePreview.innerHTML = `<span class="error">User not found or banned.</span>`;
+      }
     });
 
-    // Cart open/close
-    cartFab.onclick = () => {
-      cartDrawer.classList.add('open');
-    };
-    cartCloseBtn.onclick = () => {
-      cartDrawer.classList.remove('open');
-    };
+    // --- Firestore & Discord webhook ---
+    async function firestoreOrder(order) {
+      await addDoc(collection(db, "orders"), {
+        ...order,
+        created: serverTimestamp(),
+      });
+    }
 
-    // Remove original Place Order handling, will be replaced below
-    // cartCheckoutBtn.onclick = () => {
-    //   alert("Order placed! (This is a demo)");
-    //   cart = {};
-    //   updateCartDisplay();
-    //   cartDrawer.classList.remove('open');
-    // };
-    updateCartDisplay();
-  </script>
+    async function sendDiscordWebhook(order) {
+      // Replace with your own webhook
+      const webhookUrl = "YOUR_DISCORD_WEBHOOK_URL";
+      await fetch(webhookUrl, {
+        method: "POST",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify({
+          content: `**New Order!**
+**Roblox:** ${order.robloxUsername}
+**Email:** ${order.email}
+**Items:** ${order.items.map(i=>`\`${i.title}\` x${i.qty}`).join(", ")}
+**Total:** $${order.total}`
+        })
+      });
+    }
 
-  <script>
+    // --- PayPal Integration ---
+    function getCartItemsArray() {
+      return Object.values(cart).map(item => ({
+        name: item.title,
+        unit_amount: { currency_code: "USD", value: item.price.toFixed(2) },
+        quantity: item.qty.toString()
+      }));
+    }
+    function getCartTotal() {
+      return Object.values(cart).reduce((sum, item) => sum + item.price * item.qty, 0).toFixed(2);
+    }
+    function renderPayPalButton() {
+      const btnDiv = document.getElementById('paypal-button-container');
+      btnDiv.innerHTML = '';
+      if (Object.keys(cart).length === 0) return;
+      if (typeof paypal === "undefined" || !btnDiv) {
+        setTimeout(renderPayPalButton, 200);
+        return;
+      }
+      paypal.Buttons({
+        createOrder: function(data, actions) {
+          // Validate form
+          if (!robloxInput.value.trim() || !userEmail.value.trim()) {
+            alert("Please enter your Roblox username and email.");
+            return;
+          }
+          return actions.order.create({
+            purchase_units: [{
+              amount: {
+                currency_code: "USD",
+                value: getCartTotal(),
+                breakdown: {
+                  item_total: { currency_code: "USD", value: getCartTotal() }
+                }
+              },
+              items: getCartItemsArray()
+            }]
+          });
+        },
+        onApprove: function(data, actions) {
+          return actions.order.capture().then(async function(details) {
+            // Send to Firestore and Discord
+            const order = {
+              robloxUsername: robloxInput.value.trim(),
+              email: userEmail.value.trim(),
+              items: Object.values(cart),
+              total: getCartTotal(),
+              paypalOrderId: data.orderID,
+              payer: details.payer,
+            };
+            await firestoreOrder(order);
+            await sendDiscordWebhook(order);
+            alert("Payment complete! Thank you, " + details.payer.name.given_name + ".");
+            cart = {};
+            updateCartDisplayWithPayPal();
+            robloxInput.value = "";
+            userEmail.value = "";
+            robloxProfilePreview.innerHTML = "";
+          });
+        }
+      }).render('#paypal-button-container');
+    }
+    function updateCartDisplayWithPayPal() {
+      updateCartDisplay();
+      renderPayPalButton();
+    }
+    window.updateCartDisplay = updateCartDisplayWithPayPal;
+    document.addEventListener('DOMContentLoaded', updateCartDisplayWithPayPal);
+
     // --- SMOOTH NAVIGATION WITH CUSTOM ANIMATION ---
     function slowScrollToElement(targetId, offset = 0, duration = 1000) {
       const target = document.getElementById(targetId);
@@ -313,29 +527,30 @@
           window.scrollTo(0, elementPosition);
         }
       }
-
       requestAnimationFrame(animateScroll);
     }
-
     document.getElementById('navHome').addEventListener('click', function(e) {
-      e.preventDefault();
-      slowScrollToElement('home', 0, 800);
+      e.preventDefault(); slowScrollToElement('home', 0, 800);
     });
     document.getElementById('navShop').addEventListener('click', function(e) {
-      e.preventDefault();
-      slowScrollToElement('shop', 0, 800);
+      e.preventDefault(); slowScrollToElement('shop', 0, 800);
     });
     document.getElementById('navAbout').addEventListener('click', function(e) {
-      e.preventDefault();
-      slowScrollToElement('about', 0, 800);
+      e.preventDefault(); slowScrollToElement('about', 0, 800);
     });
     document.getElementById('navContact').addEventListener('click', function(e) {
-      e.preventDefault();
-      slowScrollToElement('contact', 0, 800);
+      e.preventDefault(); slowScrollToElement('contact', 0, 800);
     });
-  </script>
 
-  <!-- --- Cart Empty Animation and PayPal Redirect --- -->
+    // --- Cart Empty Animation ---
+    function animateCartEmpty() {
+      cartDrawer.classList.remove('cart-empty-anim');
+      void cartDrawer.offsetWidth;
+      cartDrawer.classList.add('cart-empty-anim');
+      setTimeout(() => { cartDrawer.classList.remove('cart-empty-anim'); }, 700);
+      cartDrawer.focus && cartDrawer.focus();
+    }
+  </script>
   <style>
     .cart-drawer.cart-empty-anim {
       animation: cartShake 0.42s cubic-bezier(.36,.07,.19,.97) both;
@@ -350,31 +565,5 @@
       100% { transform: translateX(0); }
     }
   </style>
-  <script>
-    function animateCartEmpty() {
-    const cartDrawer = document.getElementById('cartDrawer');
-    cartDrawer.classList.remove('cart-empty-anim'); // reset if already animating
-    void cartDrawer.offsetWidth; // force reflow
-    cartDrawer.classList.add('cart-empty-anim');
-    setTimeout(() => {
-        cartDrawer.classList.remove('cart-empty-anim');
-    }, 700); // Remove after 3 seconds
-    // Accessibility: focus cart drawer if possible
-    cartDrawer.focus && cartDrawer.focus();
-    }
-
-    const PAYPAL_REDIRECT_URL = "https://www.paypal.com"; // Replace with real PayPal checkout URL when ready
-
-    // Remove previous onclick and set new Place Order logic
-    const cartCheckoutBtn2 = document.getElementById('cartCheckoutBtn');
-    cartCheckoutBtn2.onclick = function() {
-      if (Object.keys(cart).length === 0) {
-        animateCartEmpty();
-        return;
-      }
-      // Redirect to PayPal
-      window.location.href = PAYPAL_REDIRECT_URL;
-    };
-  </script>
 </body>
 </html>
